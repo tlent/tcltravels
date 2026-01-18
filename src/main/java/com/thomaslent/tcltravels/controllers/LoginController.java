@@ -53,20 +53,20 @@ public class LoginController {
       Person person = user.getPerson();
       session.setMaxInactiveInterval(36000);
       session.setAttribute("p_id", person.getId());
-      session.setAttribute("p_firstName", person.getId());
-      session.setAttribute("p_lastName", person.getId());
+      session.setAttribute("p_firstName", person.getFirstName());
+      session.setAttribute("p_lastName", person.getLastName());
       session.setAttribute("username", user.getUsername());
       Optional<Customer> customerOpt = customerRepository.findByPerson(person);
       if (customerOpt.isPresent()) {
-        session.setAttribute("credentials", "Customer");
+        session.setAttribute("role", "Customer");
         session.setAttribute("c_accountNumber", customerOpt.get().getAccountNumber());
       } else {
         Optional<Employee> employeeOpt = employeeRepository.findByPerson(person);
         Employee employee = employeeOpt.get();
         if (employee.isManager()) {
-          session.setAttribute("credentials", "Manager");
+          session.setAttribute("role", "Manager");
         } else {
-          session.setAttribute("credentials", "Employee");
+          session.setAttribute("role", "Employee");
         }
       }
       return "redirect:/";

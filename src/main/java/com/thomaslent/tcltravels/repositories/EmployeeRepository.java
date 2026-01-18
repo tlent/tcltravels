@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.thomaslent.tcltravels.entities.Customer;
 import com.thomaslent.tcltravels.entities.Employee;
 import com.thomaslent.tcltravels.entities.Person;
 

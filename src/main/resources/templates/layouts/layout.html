@@ -1,0 +1,65 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content, title)">
+  <head>
+    <meta charset="UTF-8" />
+    <title th:text="${title}">TCL Travels</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+  </head>
+
+  <body>
+    <div id="top_bar" class="bigshadow">
+      <div id="inner_top_bar">
+        <a th:if="${session.role != 'Customer'}" th:href="@{/admin/}">
+          <div id="toolbar_btn5" class="toolbar_button">Admin Panel</div>
+        </a>
+        <a th:if="${session.role == 'Customer'}" th:href="@{/}">
+          <div id="toolbar_btn1" class="toolbar_button">Home</div>
+        </a>
+        <a th:href="@{/reservations/}">
+          <div id="toolbar_btn2" class="toolbar_button">Reservations</div>
+        </a>
+        <a th:href="@{/flights/}">
+          <div id="toolbar_btn3" class="toolbar_button">Flights</div>
+        </a>
+
+        <th:block th:if="${session.role != 'Customer'}">
+          <a th:href="@{/admin/sales/}">
+            <div id="toolbar_btn4" class="toolbar_button">Sales</div>
+          </a>
+        </th:block>
+
+        <a th:href="@{/account/}">
+          <div id="toolbar_profile" class="toolbar_button">
+            <span th:text="${session.p_firstName + ' ' + session.p_lastName}"
+              >Name</span
+            ><br />
+            <span style="font-size: 10px" th:text="${session.role}">Role</span>
+          </div>
+        </a>
+
+        <form th:action="@{/logout}" method="post" style="display: inline">
+          <input
+            id="toolbar_logout"
+            class="toolbar_button"
+            type="submit"
+            value="Logout"
+          />
+        </form>
+
+        <a th:href="@{/help}"
+          ><div id="toolbar_help" class="toolbar_button">
+            <img
+              th:src="@{/images/help.png}"
+              width="30"
+              height="30"
+              alt="Help"
+            /></div
+        ></a>
+      </div>
+    </div>
+
+    <div id="center_content">
+      <div th:replace="${content}"></div>
+    </div>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-package com.thomaslent.tcltravels;
+package com.thomaslent.tcltravels.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +21,9 @@ public class Person {
   private String lastName;
 
   private String address;
+
   private String city;
+
   private String state;
 
   @Column(name = "zip_code", nullable = false)
@@ -29,4 +31,16 @@ public class Person {
 
   @Column(nullable = false)
   private String telephone;
+
+  public Long getId() {
+    return id;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
 }

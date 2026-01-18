@@ -1,0 +1,61 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TCL Travels - Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+
+  <body>
+    <div id="login_box" class="bg1 bigshadow">
+      <div
+        class="bg2 bigshadow text_shadow1"
+        style="
+          height: 40px;
+          text-align: center;
+          color: #fff;
+          padding: 10px 0;
+          font-weight: bold;
+          font-size: 26px;
+        "
+      >
+        Welcome to TCL Travels
+      </div>
+
+      <div style="text-align: center; position: relative; height: 200px">
+        <form id="form_login" th:action="@{/login}" method="post">
+          <table style="margin-top: 20px">
+            <tr>
+              <td style="text-align: right">User:</td>
+              <td><input type="text" name="username" /></td>
+            </tr>
+            <tr>
+              <td style="text-align: right">Password</td>
+              <td><input type="password" name="password" /></td>
+            </tr>
+          </table>
+          <br />
+          <input type="submit" value="Login" />
+
+          <div class="text_shadow2" style="color: #fff; font-weight: bold; margin: 10px;">
+            <p th:if="${param.authValid != null and param.authValid[0] == '0'}">
+                You must enter a valid username and password.
+            </p>
+
+            <p th:if="${param.authValid != null and param.authValid[0] == '-1'}">
+                Incorrect username or password. Please try again.
+            </p>
+        </div>
+
+        <div style="position: absolute; bottom: 0; width: 100%; padding: 20px 0;">
+            <div th:if="${param.register != null and param.register[0] == 'true'}">
+                Now use your Username and Password to login.
+            </div>
+            <div th:unless="${param.register != null and param.register[0] == 'true'}">
+                If you're not a member, <a th:href="@{/register}">click here to register</a>
+            </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

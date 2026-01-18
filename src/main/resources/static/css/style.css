@@ -1,0 +1,519 @@
+/**
+    This is the main CSS for the entire website.
+*/
+
+/* GENERAL LAYOUT STUFF *******************************************************/
+
+html,
+body {
+  height: 100%;
+}
+body {
+  background: #d0dde7;
+
+  font-family:
+    lucida grande,
+    tahoma,
+    verdana,
+    arial,
+    sans-serif !important;
+  font-size: 14px;
+
+  margin: 40px 0 0 0;
+}
+input {
+  font-family:
+    lucida grande,
+    tahoma,
+    verdana,
+    arial,
+    sans-serif !important;
+}
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: pointer;
+}
+select {
+  margin-top: 5px;
+}
+a {
+  color: #0b4a7e;
+  text-decoration: none;
+}
+a:hover {
+  text-shadow: #fff 0 0 2px;
+}
+form {
+  margin: 0;
+}
+button {
+  cursor: pointer;
+}
+hr {
+  margin: 11px 0 -2px -4px;
+}
+
+#center_content {
+  width: 800px;
+  height: 100%;
+
+  display: table;
+
+  background: rgba(255, 255, 255, 0.3);
+
+  padding: 40px 15px;
+  margin: 0 auto;
+
+  box-shadow: #143e61 0 -3px 5px inset;
+}
+
+.bg1 {
+  background: #7babd3;
+}
+.bg2 {
+  background: #4c82af;
+}
+.light_gradient {
+  background: linear-gradient(#fff, #dee9f2) !important;
+  background: -moz-linear-gradient(#fff, #dee9f2) !important;
+  background: -webkit-linear-gradient(#fff, #dee9f2) !important;
+  background: -o-linear-gradient(#fff, #dee9f2) !important;
+}
+
+.bigshadow {
+  box-shadow: 0 0 10px #143e61;
+}
+.smallshadow {
+  box-shadow: 0 0 5px #143e61;
+}
+.inner_shadow {
+  box-shadow: 0 0 5px #143e61 inset;
+}
+.inner_shadow2 {
+  padding: 0 !important;
+  width: 10px;
+
+  box-shadow: -7px 0 5px -5px #143e61 inset;
+}
+.text_shadow1 {
+  text-shadow: 0 0 3px #143e61;
+}
+
+.text_shadow2 {
+  text-shadow: 0 0 3px #f00;
+}
+
+.hint {
+  float: right;
+}
+
+/* FONT STUFF *****************************************************************/
+
+.bigtext {
+  font-size: 25px;
+  margin-bottom: -25px !important;
+}
+.mediumtext {
+  font-size: 16px;
+}
+.smalltext {
+  font-size: 10px;
+}
+
+.align_right {
+  text-align: right;
+}
+.align_left {
+  text-align: left;
+}
+.align_middle {
+  text-align: center;
+}
+.greytext {
+  color: #888;
+}
+.redtext {
+  color: #f00;
+}
+
+/* TOP BAR STUFF **************************************************************/
+#top_bar {
+  background: linear-gradient(#7babd3, #4c82af);
+  background: -moz-linear-gradient(#7babd3, #4c82af);
+  background: -webkit-linear-gradient(#7babd3, #4c82af);
+  background: -o-linear-gradient(#7babd3, #4c82af);
+
+  top: 0;
+  margin: 0;
+  padding: 0px;
+  position: fixed;
+
+  width: 100%;
+  height: 40px;
+}
+#inner_top_bar {
+  width: 800px;
+
+  margin: 0 auto;
+  overflow: hidden;
+}
+.toolbar_button {
+  width: 95px;
+  height: 28px;
+
+  //font-weight: bold;
+  font-size: 13px;
+  color: #fff;
+  text-align: center;
+  text-shadow: #000 0 0 2px;
+
+  padding: 12px 0 0;
+  box-shadow: #143e61 0 0 5px;
+
+  position: absolute;
+}
+.toolbar_button:hover {
+  background: linear-gradient(#7babd3, #143e61) !important;
+  background: -moz-linear-gradient(#7babd3, #143e61) !important;
+  background: -webkit-linear-gradient(#7babd3, #143e61) !important;
+  background: -o-linear-gradient(#7babd3, #143e61) !important;
+
+  //box-shadow: #666 0 0 3px inset;
+}
+#toolbar_btn1 {
+  margin-left: 0px;
+}
+#toolbar_btn2 {
+  margin-left: 100px;
+}
+#toolbar_btn3 {
+  margin-left: 200px;
+}
+#toolbar_btn4 {
+  background: rgba(0, 255, 255, 0.1);
+  margin-left: 300px;
+}
+#toolbar_btn5 {
+  background: rgba(0, 255, 255, 0.1);
+  margin-left: 0px;
+}
+#toolbar_help {
+  width: 50px;
+
+  margin-left: 750px;
+  padding: 6px 0;
+}
+#toolbar_profile {
+  background: rgba(0, 255, 255, 0.1);
+  margin-left: 485px;
+  padding: 6px 0 6px 10px;
+
+  text-align: left;
+
+  width: 150px;
+}
+#toolbar_profile:hover {
+  //background: rgba(0, 255, 255, 0.1) !important;
+}
+#toolbar_logout {
+  background: rgba(255, 0, 255, 0.1);
+  border: none;
+
+  height: 40px;
+  margin-left: 650px;
+  padding: 0;
+
+  cursor: pointer;
+}
+#toolbar_logout:hover {
+  background: rgba(255, 0, 255, 0.2) !important;
+}
+
+/* TABLE STUFF ****************************************************************/
+table {
+  background: none;
+
+  font-size: 14px;
+
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+.wide_table {
+  width: 100%;
+  background: #fff;
+
+  margin: 0 auto 25px;
+
+  border-radius: 0 0 4px 4px;
+  box-shadow: #143e61 0 0 6px;
+}
+.wide_table th {
+  text-align: left;
+}
+.wide_table button {
+  width: 70px;
+}
+.sub_table {
+  width: 100%;
+
+  //border: #143e61 1px outset;
+  margin: 4px 0;
+
+  box-shadow: #143e61 0 0 3px;
+}
+.sub_table th {
+  background: #acc8e0;
+}
+
+.itin_table {
+  width: 100%;
+
+  text-align: left;
+
+  line-height: 2em;
+}
+table td,
+table th {
+  //border: #222 1px solid;
+  padding: 5px 10px;
+}
+table th {
+  background: #7babd3;
+
+  font-size: 12px;
+  //font-weight: bold;
+
+  box-shadow: inset #143e61 1px -8px 6px -8px;
+}
+table td {
+  //width: 150px;
+  vertical-align: top;
+}
+.table_header {
+  background: rgba(0, 180, 255, 0.1);
+  display: inline-block;
+
+  font-size: 16px;
+  //font-weight: bold;
+
+  padding: 2px 10px 6px;
+  margin: 0 10px;
+
+  box-shadow: #143e61 0 -4px 2px -4px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.table_message {
+  padding: 10px 0;
+
+  font-size: 16px;
+  text-align: center;
+  color: #aaa;
+}
+.table_message_small {
+  font-size: 14px;
+  text-align: center;
+  color: #aaa;
+}
+
+.help_table td {
+  font-size: 16px;
+  line-height: 2em;
+
+  padding: 10px 12px 20px;
+}
+
+/* SPECIFIC ELEMENTS STUFF ****************************************************/
+
+/* LOGIN / REGISTER STUFF *****************************************************/
+
+#login_box {
+  width: 400px;
+  height: 280px;
+
+  margin: 200px auto;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+}
+#register_box {
+  width: 700px;
+  height: 620px;
+
+  margin: 20px auto;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+}
+#register_box .error,
+#edit_employee_box .error {
+  background: red;
+  color: white;
+
+  font-weight: bold;
+
+  margin-left: -5px;
+  padding: 0 4px 1px;
+
+  box-shadow: #f00 0 0 2px;
+
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.register_table {
+  margin: 20px 0 0 70px;
+}
+.register_table input[type="text"],
+.register_table input[type="password"] {
+  width: 200px;
+}
+.register_table #zipcode {
+  width: 50px;
+}
+.register_table #telephone {
+  width: 90px;
+}
+.register_table #credit_card {
+  width: 125px;
+}
+.register_table #SSN {
+  width: 75px;
+}
+.register_table #start_date {
+  width: 75px;
+}
+.register_table #hourly_rate {
+  width: 55px;
+}
+
+/* ADMIN PAGE STUFF ***********************************************************/
+
+.big_button {
+  background: linear-gradient(#acc8e0, #4c82af) !important;
+  background: -moz-linear-gradient(#acc8e0, #4c82af) !important;
+  background: -webkit-linear-gradient(#acc8e0, #4c82af) !important;
+  background: -o-linear-gradient(#acc8e0, #4c82af) !important;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+
+  width: 115px;
+  margin: 10px 0;
+  padding: 10px 20px;
+
+  border-radius: 4px;
+
+  cursor: pointer;
+}
+.big_button:hover {
+  background: linear-gradient(#7babd3, #143e61) !important;
+  background: -moz-linear-gradient(#7babd3, #143e61) !important;
+  background: -webkit-linear-gradient(#7babd3, #143e61) !important;
+  background: -o-linear-gradient(#7babd3, #143e61) !important;
+}
+#cancel1,
+#cancel2 {
+  background: #f05 !important;
+}
+#cancel1:hover,
+#cancel2:hover {
+  background: #f00 !important;
+
+  box-shadow: #f00 0 0 10px;
+}
+#employee_table tr.edit_active:hover {
+  background: rgba(255, 150, 0, 0.2);
+  cursor: pointer;
+}
+#employee_table tr.del_active:hover {
+  background: rgba(255, 0, 0, 0.2);
+  cursor: pointer;
+}
+#edit_employee_box input[type="submit"],
+#edit_employee_box input[type="reset"],
+#edit_employee_box input[type="button"],
+#delete_employee_box input[type="submit"],
+#delete_employee_box input[type="reset"],
+#delete_employee_box input[type="button"] {
+  height: 30px;
+  width: 100px;
+  margin: 0 2px;
+}
+
+/* USER PROFILE PAGE STUFF ****************************************************/
+
+.profile_table {
+  width: 700px;
+
+  background: rgba(255, 255, 255, 0.3);
+
+  border-radius: 4px;
+}
+.profile_table #left_column {
+  width: 128px;
+  box-shadow: #143e61 -5px 0 5px -7px inset;
+}
+.profile_table span {
+  margin: 1px 0;
+  display: inline-block;
+}
+.profile_table .error {
+  float: right;
+}
+.profile_table input[type="text"] {
+  background: none;
+  border: none;
+  display: none;
+
+  margin: 1px 0 !important;
+  padding: 0 !important;
+}
+.profile_table input[type="text"]:focus {
+  background: rgba(142, 180, 212, 0.2);
+  border: none;
+}
+.profile_table input[type="button"],
+.profile_table input[type="submit"],
+.profile_table input[type="reset"] {
+  width: 100px;
+  height: 30px;
+}
+.profile_table #e_button {
+}
+
+/* Toggle Buttons for User Info ***********************************************/
+
+.toggle_button1 {
+  display: none;
+}
+
+.toggle_button2 {
+  display: inline;
+}
+
+/* Make Reservations Page *****************************************************/
+
+#reservation_form td {
+  padding: 5px 25px;
+}
+#reservation_form input[type="submit"] {
+  padding: 5px 10px;
+  font-size: 16px;
+}
+
+.person_style {
+  display: none;
+}
+
+.select_style {
+  padding: 20px;
+  border-radius: 20px;
+  background-color: #008080;
+  float: right;
+  color: #eee;
+}

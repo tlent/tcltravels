@@ -95,6 +95,14 @@ public class FlightsController {
 
     model.addAttribute("flights_info", flightViews);
 
+    List<FlightRecommendationRow> bestSellingFlightsRows = flightRepository.findBestSellingFlights();
+    List<FlightView> bestSellingFlightViews = bestSellingFlightsRows.stream().map(row -> new FlightView(
+        row.getAirlineId(), row.getFlightNumber(), row.getNumberOfSeats(), formatDaysOperating(row.getDaysOperating()),
+        row.getOriginId(), row.getOriginCity(), row.getDestinationId(), row.getDestinationCity()))
+        .collect(Collectors.toList());
+
+    model.addAttribute("best_flights", bestSellingFlightViews);
+
     return "flights";
   }
 

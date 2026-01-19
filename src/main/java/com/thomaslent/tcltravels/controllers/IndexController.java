@@ -20,4 +20,12 @@ public class IndexController {
     }
     return "index";
   }
+
+  @GetMapping("/help")
+  public String help(HttpSession session) {
+    if (session.getAttribute("p_id") == null) {
+      return "redirect:/login";
+    }
+    return "help";
+  }
 }

@@ -1,0 +1,189 @@
+<div
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Help Page')}"
+>
+  <main>
+    <div id="user_help" th:if="${session.role == 'Customer'}">
+      <select class="select_style" id="toMove">
+        <option value="resvflight">Reserving a Flight</option>
+        <option value="bidflight">Bidding on a Flight</option>
+        <option value="changeinfo">Changing Your Info</option>
+        <option value="findresv">Finding a Reservation</option>
+      </select>
+      <br /><br /><br />
+
+      <div id="resvflight" class="table_header">Reserving a Flight</div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            To reserve a specific flight listed under a flight listing, such as
+            our recommendations of flights for you simply press the "reserve"
+            button next to the flight listing. From here you are given the
+            options of selecting additional passengers to purchase reservations
+            for. In addition you must enter the first, last, and class of ticket
+            for each passenger (including yourself). After submitting your all
+            ready to go and the reservation will appear in the reservations tab.
+          </td>
+        </tr>
+      </table>
+
+      <div id="bidflight" class="table_header">Bidding on a Flight</div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            To participate in a reverse auction, a process by which you get to
+            pick the price of one of the given flights, simply press the bid
+            button.Unlike reserving a flight this can not be done for other
+            people and your flight information (including first, last, meals,
+            class of ticket) must be entered. Most importantly you must place
+            your bid, which upon submitting will be processed by our database
+            and determine whether your bid was selected or rejected.
+          </td>
+        </tr>
+      </table>
+
+      <div id="changeinfo" class="table_header">Changing Your Info</div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            If you wish to change any relevant information that you entered when
+            registering please click on your username in the upper right.
+            Clicking on the edit button will allow you to change your
+            information, if you wish to not make any changes or undo what you
+            have typed press cancel. Else submit your changes with the submit
+            button and the information will be updated.
+          </td>
+        </tr>
+      </table>
+
+      <div id="findresv" class="table_header">Making a Reservation</div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            If you wish to make a more custom Reservation, then go to the
+            reservation tab and use the Make a reservation feature to construct
+            a reservation leg by leg. First you must enter the airports for
+            destination and origin of your reservation. You must also select the
+            time from which you will leave and then submit the form. From there
+            you will be directed to a page that will handle the construction of
+            your reservation path.
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="employee_help" th:if="${session.role != 'Customer'}">
+      <select class="select_style" id="toMove">
+        <option value="AddEdit">Add and Edit Employees</option>
+        <option value="GetMonth">Get sales report by Month</option>
+        <option value="GetFlight">Get sales report by Flight</option>
+        <option value="GetCustomer">Get sales report by Customer</option>
+        <option value="GetCity">Get sales report by City</option></select
+      ><br /><br /><br />
+      <div id="AddEdit" class="table_header">Add and Edit Employees</div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            To add a new employee or make a change to an existing employee go to
+            the Admin panel and press the add or change employee button. This
+            will take you a form which can be changed a re-submitted.
+          </td>
+        </tr>
+      </table>
+      <div id="GetMonth" class="table_header">Get a sales Report by Month</div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            If you wish to view a specifics sales report select a month and year
+            and press view sales report. This will show the desired sales report
+            for the time entered.
+          </td>
+        </tr>
+      </table>
+      <div id="GetFlight" class="table_header">
+        Get a sales Report by Flight
+      </div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            If you wish to view a specifics sales report for a flight select
+            from the drop-down on the Sales Report table and press view sales
+            report. This will show the desired sales report for the flight.
+          </td>
+        </tr>
+      </table>
+      <div id="GetCustomer" class="table_header">
+        Get a sales Report by Customer
+      </div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            If you wish to view a specifics sales report for a customer then
+            select the customer from the drop-down menu and press view sales
+            report. This will show the desired sales report for the flight.
+          </td>
+        </tr>
+      </table>
+      <div id="GetCity" class="table_header">Get a sales Report by City</div>
+      <table class="wide_table light_gradient help_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="inner_shadow2"></td>
+          <td>
+            If you wish to view a specifics sales report for a city then select
+            the city from the drop-down menu in the sales report table and press
+            the view sales report button. This will show the desired sales
+            report for the flight.
+          </td>
+        </tr>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", () => {
+    const toMoveElement = document.querySelector("#toMove");
+    toMoveElement.addEventListener("change", () => {
+      const target = document.getElementById(toMoveElement.value);
+      if (target) {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    });
+  });
+</script>

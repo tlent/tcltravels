@@ -9,6 +9,6 @@ import com.thomaslent.tcltravels.entities.Employee;
 import com.thomaslent.tcltravels.entities.Person;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, String> {
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
   public Optional<Employee> findByPerson(Person person);
 }

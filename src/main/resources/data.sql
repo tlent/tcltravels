@@ -567,3 +567,58 @@ INSERT INTO
   employees
 VALUES
   (6, 123654132, true, '2014-05-08', 150.00);
+
+SELECT
+  setval(
+    pg_get_serial_sequence('persons', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        persons
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('customers', 'account_number'),
+    (
+      SELECT
+        MAX(account_number)
+      FROM
+        customers
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('app_users', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        app_users
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('passengers', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        passengers
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('reservations', 'reservation_number'),
+    (
+      SELECT
+        MAX(reservation_number)
+      FROM
+        reservations
+    )
+  );

@@ -30,7 +30,44 @@ public class Employee {
   @JoinColumn(name = "id", referencedColumnName = "id")
   private Person person;
 
-  public boolean isManager() {
+  public Integer getSsn() {
+    return ssn;
+  }
+
+  public void setSsn(Integer ssn) {
+    this.ssn = ssn;
+  }
+
+  public Boolean getIsManager() {
     return isManager;
   }
+
+  public void setIsManager(Boolean isManager) {
+    this.isManager = isManager;
+  }
+
+  public LocalDate getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(LocalDate startDate) {
+    this.startDate = startDate;
+  }
+
+  public BigDecimal getHourlyRate() {
+    return hourlyRate;
+  }
+
+  public void setHourlyRate(BigDecimal hourlyRate) {
+    this.hourlyRate = hourlyRate;
+  }
+
+  public Person getPerson() {
+    return person;
+  }
+
+  public void setPerson(Person person) {
+    this.person = person;
+  }
+
 }

@@ -63,7 +63,7 @@ public class LoginController {
       } else {
         Optional<Employee> employeeOpt = employeeRepository.findByPerson(person);
         Employee employee = employeeOpt.get();
-        if (employee.isManager()) {
+        if (employee.getIsManager()) {
           session.setAttribute("role", "Manager");
         } else {
           session.setAttribute("role", "Employee");

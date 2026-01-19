@@ -44,4 +44,49 @@ public class Customer {
   public Long getAccountNumber() {
     return accountNumber;
   }
+
+  public void setAccountNumber(Long accountNumber) {
+    this.accountNumber = accountNumber;
+  }
+
+  public String getCreditCardNumber() {
+    return creditCardNumber;
+  }
+
+  public void setCreditCardNumber(String creditCardNumber) {
+    this.creditCardNumber = creditCardNumber;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public OffsetDateTime getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(OffsetDateTime creationDate) {
+    this.creationDate = creationDate;
+  }
+
+  public Integer getRating() {
+    return rating;
+  }
+
+  public void setRating(Integer rating) {
+    this.rating = rating;
+  }
+
+  public Person getPerson() {
+    return person;
+  }
+
+  public void setPerson(Person person) {
+    this.person = person;
+  }
+
 }

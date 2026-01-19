@@ -15,7 +15,7 @@ public class IndexController {
       return "redirect:/login";
     }
     String role = (String) session.getAttribute("role");
-    if ("Employee".equals(role) || "Admin".equals(role)) {
+    if (!"Customer".equals(role)) {
       return "redirect:/admin/";
     }
     return "index";

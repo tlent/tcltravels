@@ -9,26 +9,26 @@
   <body>
     <div id="top_bar" class="bigshadow">
       <div id="inner_top_bar">
-        <a th:if="${session.role != 'Customer'}" th:href="@{/admin/}">
+        <a th:if="${session.role != 'Customer'}" th:href="@{/admin}">
           <div id="toolbar_btn5" class="toolbar_button">Admin Panel</div>
         </a>
         <a th:if="${session.role == 'Customer'}" th:href="@{/}">
           <div id="toolbar_btn1" class="toolbar_button">Home</div>
         </a>
-        <a th:href="@{/reservations/}">
+        <a th:href="@{/reservations}">
           <div id="toolbar_btn2" class="toolbar_button">Reservations</div>
         </a>
-        <a th:href="@{/flights/}">
+        <a th:href="@{/flights}">
           <div id="toolbar_btn3" class="toolbar_button">Flights</div>
         </a>
 
         <th:block th:if="${session.role != 'Customer'}">
-          <a th:href="@{/admin/sales/}">
+          <a th:href="@{/admin/sales}">
             <div id="toolbar_btn4" class="toolbar_button">Sales</div>
           </a>
         </th:block>
 
-        <a th:href="@{/account/}">
+        <a th:href="@{/account}" th:if="${session.role == 'Customer'}">
           <div id="toolbar_profile" class="toolbar_button">
             <span th:text="${session.p_firstName + ' ' + session.p_lastName}"
               >Name</span
@@ -36,6 +36,17 @@
             <span style="font-size: 10px" th:text="${session.role}">Role</span>
           </div>
         </a>
+
+        <div
+          id="toolbar_profile"
+          class="toolbar_button"
+          th:if="${session.role != 'Customer'}"
+        >
+          <span th:text="${session.p_firstName + ' ' + session.p_lastName}"
+            >Name</span
+          ><br />
+          <span style="font-size: 10px" th:text="${session.role}">Role</span>
+        </div>
 
         <form th:action="@{/logout}" method="post" style="display: inline">
           <input

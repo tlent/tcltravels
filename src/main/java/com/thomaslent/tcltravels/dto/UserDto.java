@@ -5,32 +5,35 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class RegistrationDto {
+public class UserDto {
   @NotBlank(message = "First name is required")
   @Pattern(regexp = "^[a-zA-Z]+$", message = "First name must contain only letters")
+  @Size(min = 2)
   private String firstName;
 
   @NotBlank(message = "Last name is required")
   @Pattern(regexp = "^[a-zA-Z]+$", message = "Last name must contain only letters")
+  @Size(min = 2)
   private String lastName;
 
   @Email(message = "Please enter a valid email")
   @NotBlank(message = "Email is required")
   private String email;
 
-  @Size(min = 6, message = "Password must be at least 6 characters")
   private String password;
 
   @Pattern(regexp = "^\\d{5}$", message = "ZIP must be exactly 5 digits")
   private String zipcode;
 
   @Pattern(regexp = "^\\d{16}$", message = "Credit card must be 16 digits")
-  private String creditCard;
+  private String creditCardNumber;
 
   @NotBlank(message = "Address is required")
+  @Size(min = 6)
   private String address;
 
   @NotBlank(message = "City is required")
+  @Size(min = 3)
   private String city;
 
   @NotBlank(message = "State is required")
@@ -88,12 +91,12 @@ public class RegistrationDto {
     this.zipcode = zipcode;
   }
 
-  public String getCreditCard() {
-    return creditCard;
+  public String getCreditCardNumber() {
+    return creditCardNumber;
   }
 
-  public void setCreditCard(String creditCard) {
-    this.creditCard = creditCard;
+  public void setCreditCardNumber(String creditCard) {
+    this.creditCardNumber = creditCard;
   }
 
   public String getTelephone() {

@@ -206,7 +206,7 @@ VALUES
     'Doe',
     '123 N Fake Street, New York, New York 10001',
     'New York',
-    'New York',
+    'NY',
     10001,
     '1231231234'
   ),
@@ -216,7 +216,7 @@ VALUES
     'Smith',
     '100 Nicolls Rd, Stony Brook, New York 17790',
     'Stony Brook',
-    'New York',
+    'NY',
     17790,
     '5555555555'
   ),
@@ -226,7 +226,7 @@ VALUES
     'Astley',
     '1337 Internet Lane, Los Angeles, California 90001',
     'Los Angeles',
-    'California',
+    'CA',
     90001,
     '3141592653'
   ),
@@ -236,7 +236,7 @@ VALUES
     'Ross',
     '100 Main St, New York, New York 11111',
     'New York',
-    'New York',
+    'NY',
     11111,
     '1234567890'
   );
@@ -551,7 +551,7 @@ VALUES
     'Skynard',
     'SomeWhere',
     'Else',
-    'Home',
+    'NY',
     12345,
     1234567899
   );

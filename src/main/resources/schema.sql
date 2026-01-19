@@ -94,7 +94,7 @@ CREATE TABLE persons (
   last_name TEXT NOT NULL,
   address TEXT,
   city TEXT,
-  state TEXT,
+  state CHAR(2),
   zip_code INTEGER NOT NULL CHECK (
     zip_code BETWEEN 10000
     AND 99999

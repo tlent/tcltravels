@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.thomaslent.tcltravels.entities.Customer;
@@ -16,23 +15,22 @@ import com.thomaslent.tcltravels.entities.Person;
 import com.thomaslent.tcltravels.entities.User;
 import com.thomaslent.tcltravels.repositories.CustomerRepository;
 import com.thomaslent.tcltravels.repositories.EmployeeRepository;
-import com.thomaslent.tcltravels.repositories.UserRepository;
+import com.thomaslent.tcltravels.services.UserService;
 
 @Controller
-@RequestMapping("/login")
 public class LoginController {
-  private UserRepository userRepository;
+  private UserService userService;
   private CustomerRepository customerRepository;
   private EmployeeRepository employeeRepository;
 
-  private LoginController(UserRepository userRepository, CustomerRepository customerRepository,
+  private LoginController(UserService userService, CustomerRepository customerRepository,
       EmployeeRepository employeeRepository) {
-    this.userRepository = userRepository;
+    this.userService = userService;
     this.customerRepository = customerRepository;
     this.employeeRepository = employeeRepository;
   }
 
-  @GetMapping
+  @GetMapping("/login")
   public String showLoginPage(HttpSession session) {
     if (session.getAttribute("p_id") != null) {
       return "redirect:/";
@@ -40,15 +38,15 @@ public class LoginController {
     return "login";
   }
 
-  @PostMapping
+  @PostMapping("/login")
   public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
     if (username.trim().isEmpty() || password.trim().isEmpty()) {
       return "redirect:/login?authValid=0";
     }
 
-    Optional<User> userOpt = userRepository.findByUsername(username);
+    Optional<User> userOpt = userService.findUser(username, password);
 
-    if (userOpt.isPresent() && userOpt.get().getPassword().equals(password)) {
+    if (userOpt.isPresent()) {
       User user = userOpt.get();
       Person person = user.getPerson();
       session.setMaxInactiveInterval(36000);
@@ -73,6 +71,12 @@ public class LoginController {
     } else {
       return "redirect:/login?authValid=-1";
     }
+  }
+
+  @PostMapping("/logout")
+  public String logout(HttpSession session) {
+    session.invalidate();
+    return "redirect:/";
   }
 
 }

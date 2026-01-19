@@ -100,7 +100,7 @@
 
             <tr>
               <td class="align_right">
-                ZIP <br /><span class="smalltext">(5 Digits)</span>
+                ZIP Code <br /><span class="smalltext">(5 Digits)</span>
               </td>
               <td>
                 <input type="text" th:field="*{zipcode}" />
@@ -116,14 +116,16 @@
 
             <tr>
               <td class="align_right">
-                Credit Card <br /><span class="smalltext">(16 Digits)</span>
+                Credit Card Number<br /><span class="smalltext"
+                  >(16 Digits)</span
+                >
               </td>
               <td>
-                <input type="text" th:field="*{creditCard}" />
+                <input type="text" th:field="*{creditCardNumber}" />
                 <span
                   class="error"
-                  th:if="${#fields.hasErrors('creditCard')}"
-                  th:errors="*{creditCard}"
+                  th:if="${#fields.hasErrors('creditCardNumber')}"
+                  th:errors="*{creditCardNumber}"
                 >
                   Invalid Credit Card [Enter 16 digits]
                 </span>

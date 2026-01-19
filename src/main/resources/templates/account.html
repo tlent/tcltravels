@@ -1,0 +1,270 @@
+<div
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - ${session.p_firstName} ${session.p_lastName}')}"
+>
+  <main>
+    <form
+      id="user_form"
+      th:action="@{/account}"
+      th:object="${editUserForm}"
+      method="post"
+    >
+      <table class="profile_table smallshadow mediumtext">
+        <tr>
+          <td rowspan="11" id="left_column"></td>
+          <td>
+            <span id="S_firstName" class="bigtext" th:text="*{firstName}"
+              >First Name</span
+            >
+            <span id="S_lastName" class="bigtext" th:text="*{lastName}"
+              >Last Name</span
+            >
+            <input
+              type="text"
+              id="I_firstName"
+              class="bigtext"
+              th:field="*{firstName}"
+              onkeyup="resize('I_firstName', 35)"
+            />
+            <input
+              type="text"
+              id="I_lastName"
+              class="bigtext"
+              th:field="*{lastName}"
+              onkeyup="resize('I_lastName', 35)"
+            />
+            <span class="hint greytext" style="display: none; float: right"
+              >Click on the field you want to change.</span
+            >
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('firstName')}"
+              th:errors="*{firstName}"
+              >Invalid First Name</span
+            >
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('lastName')}"
+              th:errors="*{lastName}"
+              >Invalid Last Name</span
+            >
+            <hr />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Address:
+            <span id="S_address" th:text="*{address}">Address</span>
+            <input
+              type="text"
+              id="I_address"
+              class="mediumtext"
+              th:field="*{address}"
+            />
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('address')}"
+              th:errors="*{address}"
+              >Invalid Address</span
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>
+            City:
+            <span id="S_city" th:text="*{city}">City</span>
+            <input
+              type="text"
+              id="I_city"
+              class="mediumtext"
+              th:field="*{city}"
+            />
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('city')}"
+              th:errors="*{city}"
+              >Invalid City</span
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>
+            State:
+            <span id="S_state" th:text="*{state}">State</span>
+            <input
+              type="text"
+              id="I_state"
+              class="mediumtext"
+              th:field="*{state}"
+            />
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('state')}"
+              th:errors="*{state}"
+              >Invalid State [Enter 2 letters (NY)]</span
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>
+            ZIP:
+            <span id="S_zipcode" th:text="*{zipcode}">Zip Code</span>
+            <input
+              type="text"
+              id="I_zipcode"
+              class="mediumtext"
+              th:field="*{zipcode}"
+            />
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('zipcode')}"
+              th:errors="*{zipcode}"
+              >Invalid ZIP [Enter 5 digits]</span
+            >
+            <hr />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Credit Card:
+            <span
+              id="S_credit_card"
+              th:text="*{'xxxx-xxxx-xxxx-' + creditCardNumber.substring(creditCardNumber.length() - 4)}"
+              >Credit Card Number</span
+            >
+            <input
+              type="text"
+              id="I_credit_card"
+              class="mediumtext"
+              th:field="*{creditCardNumber}"
+            />
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('creditCardNumber')}"
+              th:errors="*{creditCardNumber}"
+              >Invalid Credit Card [Enter 16 digits]</span
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Telephone:
+            <span id="S_telephone" th:text="*{telephone}">Telephone</span>
+            <input
+              type="text"
+              id="I_telephone"
+              class="mediumtext"
+              th:field="*{telephone}"
+            />
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('telephone')}"
+              th:errors="*{telephone}"
+              >Invalid Telephone [Enter 10-11 digits]</span
+            >
+            <hr />
+          </td>
+        </tr>
+        <tr>
+          <td class="greytext">
+            <span class="hint" style="display: none; float: right"
+              >Re-enter your password for authentication.</span
+            >
+            Email:
+            <span id="email" th:text="*{email}">Email</span>
+            <input type="hidden" th:field="*{email}" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Password:
+            <span id="S_password">******</span>
+            <input
+              type="password"
+              id="I_password"
+              class="mediumtext"
+              style="display: none"
+              th:field="*{password}"
+            />
+
+            <span
+              class="redtext error"
+              th:if="${#fields.hasErrors('password')}"
+              th:errors="*{password}"
+              >Wrong Password</span
+            >
+            <hr />
+          </td>
+        </tr>
+        <tr>
+          <td class="align_right">
+            <input
+              type="submit"
+              id="s_button"
+              value="Submit"
+              class="toggle_button1"
+            />
+            <input
+              type="button"
+              id="e_button"
+              value="Edit"
+              onclick="toggleEditable(1)"
+              class="toggle_button2"
+            />
+            <input
+              type="reset"
+              id="c_button"
+              value="Cancel"
+              onclick="toggleEditable(0)"
+              class="toggle_button1"
+            />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </main>
+</div>
+<script>
+  function resize(id, font) {
+    var size = font * 0.7;
+    const element = document.getElementById(id);
+    element.width = element.value.length * size;
+  }
+
+  function toggleEditable(choice) {
+    let display1;
+    let display2;
+    if (choice === 1) {
+      display1 = "inline";
+      display2 = "none";
+    } else {
+      display1 = "none";
+      display2 = "inline-block";
+    }
+    document.getElementById("s_button").style.display = display1;
+    document.getElementById("e_button").style.display = display2;
+    document.getElementById("c_button").style.display = display1;
+    document.getElementById("I_firstName").style.width =
+      2 + document.getElementById("S_firstName").offsetWidth + "px";
+    document.getElementById("I_lastName").style.width =
+      2 + document.getElementById("S_lastName").offsetWidth + "px";
+    document
+      .querySelectorAll("*[id*=I_]")
+      .forEach((element) => (element.style.display = display1));
+    document
+      .querySelectorAll("*[id*=S_]")
+      .forEach((element) => (element.style.display = display2));
+    document
+      .querySelectorAll(".hint")
+      .forEach((element) => (element.style.display = display1));
+    document
+      .querySelectorAll(".error")
+      .forEach((element) => (element.style.display = "none"));
+  }
+</script>

@@ -1,0 +1,145 @@
+<div
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Flights')}"
+>
+  <main>
+    <div class="table_header">Flight Filter</div>
+    <table class="wide_table">
+      <tr>
+        <th colspan="2"></th>
+      </tr>
+      <tr>
+        <td class="light_gradient" style="padding: 10px">
+          <form th:action="@{/flights}" method="get">
+            <table>
+              <tr>
+                <td>Airline:</td>
+                <td>
+                  <select name="ff_airline">
+                    <option
+                      th:each="a : ${airlines}"
+                      th:value="${a.id}"
+                      th:text="${a.name}"
+                      th:selected="${a.id == selectedAirlineId}"
+                    ></option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Airport:</td>
+                <td>
+                  <select name="ff_airport">
+                    <option
+                      th:each="a : ${airports}"
+                      th:value="${a.id}"
+                      th:text="${a.name}"
+                      th:selected="${a.id == selectedAirportId}"
+                    ></option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Departing after:</td>
+                <td>
+                  <input type="date" name="ff_after" th:value="${after}" />
+                </td>
+              </tr>
+              <tr>
+                <td>Departing before:</td>
+                <td>
+                  <input type="date" name="ff_before" th:value="${before}" />
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <input type="submit" value="Filter Flights" />
+                </td>
+              </tr>
+            </table>
+          </form>
+        </td>
+        <td class="light_gradient">
+          <table
+            id="sales_report_table"
+            class="wide_table"
+            style="width: 600px"
+          >
+            <tr class="align_left">
+              <th>Airline ID</th>
+              <th>Airport</th>
+              <th>Flight No.</th>
+              <th>Stop Number</th>
+              <th>Arrival Time</th>
+              <th>Departure Time</th>
+              <th>Reserve</th>
+              <th>Bid</th>
+            </tr>
+            <tr th:if="${#lists.isEmpty(matchingStops)}">
+              <td colspan="8">
+                <div class="table_message">No matching flights.</div>
+              </td>
+            </tr>
+            <tr th:each="s : ${matchingStops}">
+              <td th:text="${s.airlineId}">Airline ID</td>
+              <td th:text="${s.airportId}">Airport ID</td>
+              <td th:text="${s.flightNumber}">Flight Number</td>
+              <td th:text="${s.stopNumber}">Stop Number</td>
+              <td
+                th:text="${#temporals.format(s.arrivalTime, 'MMMM d, yyyy | hh:mm a')}"
+              >
+                Arrival Time
+              </td>
+              <td
+                th:text="${#temporals.format(s.departureTime, 'MMMM d, yyyy | hh:mm a')}"
+              >
+                Departure Time
+              </td>
+              <td>
+                <form
+                  th:action="@{/reservations/processReservation}"
+                  method="post"
+                >
+                  <input
+                    type="hidden"
+                    name="flightNumber"
+                    th:value="${s.flightNumber}"
+                  />
+                  <input
+                    type="hidden"
+                    name="airlineID"
+                    th:value="${s.airlineId}"
+                  />
+                  <input
+                    type="hidden"
+                    name="departureDate"
+                    th:value="${s.departureDate}"
+                  />
+                  <input type="submit" value="Reserve" />
+                </form>
+              </td>
+              <td>
+                <form th:action="@{/flights/placeBid}" method="post">
+                  <input
+                    type="hidden"
+                    name="flightNumber"
+                    th:value="${s.flightNumber}"
+                  />
+                  <input
+                    type="hidden"
+                    name="airlineID"
+                    th:value="${s.airlineId}"
+                  />
+                  <input
+                    type="hidden"
+                    name="departureDate"
+                    th:value="${s.departureDate}"
+                  />
+                  <input type="submit" value="Bid" />
+                </form>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </main>
+</div>

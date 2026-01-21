@@ -23,7 +23,7 @@ public class LoginController {
   private CustomerRepository customerRepository;
   private EmployeeRepository employeeRepository;
 
-  private LoginController(UserService userService, CustomerRepository customerRepository,
+  public LoginController(UserService userService, CustomerRepository customerRepository,
       EmployeeRepository employeeRepository) {
     this.userService = userService;
     this.customerRepository = customerRepository;

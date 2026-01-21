@@ -17,7 +17,7 @@ import jakarta.validation.Valid;
 public class UserController {
   private UserService userService;
 
-  private UserController(UserService userService) {
+  public UserController(UserService userService) {
     this.userService = userService;
   }
 

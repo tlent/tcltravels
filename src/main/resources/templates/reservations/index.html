@@ -1,0 +1,9 @@
+<div
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reservations')}"
+>
+  <main>
+    <div th:replace="~{reservations/modules/current :: current_list}"></div>
+    <div th:replace="~{reservations/modules/history :: history_list}"></div>
+    <div th:replace="~{reservations/modules/auction :: auction_list}"></div>
+  </main>
+</div>

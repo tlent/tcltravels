@@ -1,0 +1,44 @@
+<div th:fragment="rec_list">
+  <div class="table_header">Recommended Flights</div>
+  <table class="wide_table">
+    <tr class="align_left">
+      <th>Airline ID</th>
+      <th>Flight No.</th>
+      <th>Seats</th>
+      <th>Days Operating</th>
+      <th>Flying From</th>
+      <th>Flying To</th>
+      <th>Reserve</th>
+      <th>Bid</th>
+    </tr>
+    <tr th:if="${#lists.isEmpty(recommended_flights)}">
+      <td colspan="8">
+        <div class="table_message">
+          Sorry we have no recommendations for you!
+        </div>
+      </td>
+    </tr>
+    <tr th:each="f : ${recommended_flights}">
+      <td th:text="${f.airlineId}"></td>
+      <td th:text="${f.flightNumber}"></td>
+      <td th:text="${f.numberOfSeats}"></td>
+      <td th:text="${f.daysOperatingLabel}"></td>
+      <td th:text="|${f.originId} (${f.originCity})|"></td>
+      <td th:text="|${f.destinationId} (${f.destinationCity})|"></td>
+      <td>
+        <form th:action="@{/reservations/processReservation}" method="post">
+          <input type="hidden" name="flightNumber" th:value="${f.flightNumber}" />
+          <input type="hidden" name="airlineId" th:value="${f.airlineId}" />
+          <input type="submit" value="Reserve" />
+        </form>
+      </td>
+      <td>
+        <form th:action="@{/flights/placeBid}" method="post">
+          <input type="hidden" name="flightNumber" th:value="${f.flightNumber}" />
+          <input type="hidden" name="airlineId" th:value="${f.airlineId}" />
+          <input type="submit" value="Bid" />
+        </form>
+      </td>
+    </tr>
+  </table>
+</div>

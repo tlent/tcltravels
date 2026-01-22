@@ -8,25 +8,25 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.thomaslent.tcltravels.entities.StopsAt;
 
 public interface StopsAtRepository extends JpaRepository<StopsAt, Long> {
-    List<StopsAt> findByFlightAirline_IdAndFlightFlightNumberOrderByStopNumber(
+    List<StopsAt> findByFlight_Airline_IdAndFlight_FlightNumberOrderByStopNumber(
             String airlineId, Integer flightNumber);
 
-    StopsAt findFirstByFlightAirline_IdAndFlightFlightNumberAndStopNumberOrderByDepartureTimeAsc(
+    StopsAt findFirstByFlight_Airline_IdAndFlight_FlightNumberAndStopNumberOrderByDepartureTimeAsc(
             String airlineId, Integer flightNumber, Integer stopNumber);
 
-    StopsAt findTopByFlightAirline_IdAndFlightFlightNumberOrderByStopNumberDesc(
+    StopsAt findTopByFlight_Airline_IdAndFlight_FlightNumberOrderByStopNumberDesc(
             String airlineId, Integer flightNumber);
 
-    boolean existsByFlightAirline_IdAndFlightFlightNumberAndStopNumberAndDepartureTimeBetween(
+    boolean existsByFlight_Airline_IdAndFlight_FlightNumberAndStopNumberAndDepartureTimeBetween(
             String airlineId, Integer flightNumber, Integer stopNumber,
             OffsetDateTime start, OffsetDateTime end);
 
-    List<StopsAt> findByFlightAirline_IdAndAirport_IdAndDepartureTimeGreaterThanEqual(
+    List<StopsAt> findByFlight_Airline_IdAndAirport_IdAndDepartureTimeGreaterThanEqual(
             String airlineId,
             String airportId,
             OffsetDateTime after);
 
-    List<StopsAt> findByFlightAirline_IdAndAirport_IdAndDepartureTimeBetween(
+    List<StopsAt> findByFlight_Airline_IdAndAirport_IdAndDepartureTimeBetween(
             String airlineId,
             String airportId,
             OffsetDateTime after,

@@ -123,7 +123,7 @@ public class ReservationsService {
   }
 
   public List<StopView> getStopsForFlight(String airlineId, Integer flightNumber) {
-    return stopsAtRepository.findByFlightAirline_IdAndFlightFlightNumberOrderByStopNumber(
+    return stopsAtRepository.findByFlight_Airline_IdAndFlight_FlightNumberOrderByStopNumber(
         airlineId, flightNumber).stream()
         .map(stop -> new StopView(
             stop.getFlight().getAirline().getId(),
@@ -140,7 +140,7 @@ public class ReservationsService {
     OffsetDateTime departure = null;
     if (airlineId != null && flightNumber != null) {
       var stop = stopsAtRepository
-          .findFirstByFlightAirline_IdAndFlightFlightNumberAndStopNumberOrderByDepartureTimeAsc(
+          .findFirstByFlight_Airline_IdAndFlight_FlightNumberAndStopNumberOrderByDepartureTimeAsc(
               airlineId, flightNumber, 1);
       if (stop != null) {
         departure = stop.getDepartureTime();
@@ -221,7 +221,7 @@ public class ReservationsService {
       return new BidResult(false, false, dateError.get());
     }
 
-    Fare hiddenFare = fareRepository.findByFlightAirline_IdAndFlightFlightNumberAndFareTypeAndSeatClass(
+    Fare hiddenFare = fareRepository.findByFlight_Airline_IdAndFlight_FlightNumberAndFareTypeAndSeatClass(
         form.getAirlineId(), form.getFlightNumber(), 2, form.getFlightClass()).orElse(null);
     if (hiddenFare == null) {
       return new BidResult(false, false, "Fare information is unavailable for this flight.");
@@ -243,7 +243,7 @@ public class ReservationsService {
     }
 
     StopsAt lastStop = stopsAtRepository
-        .findTopByFlightAirline_IdAndFlightFlightNumberOrderByStopNumberDesc(
+        .findTopByFlight_Airline_IdAndFlight_FlightNumberOrderByStopNumberDesc(
             form.getAirlineId(), form.getFlightNumber());
     if (lastStop == null) {
       return new BidResult(false, false, "Flight stops could not be loaded.");
@@ -315,7 +315,7 @@ public class ReservationsService {
   private BigDecimal calculateFareTotal(ReservationForm form) {
     BigDecimal totalFares = BigDecimal.ZERO;
     for (int i = 1; i <= form.getPassengerCount(); i++) {
-      Fare fare = fareRepository.findByFlightAirline_IdAndFlightFlightNumberAndFareTypeAndSeatClass(
+      Fare fare = fareRepository.findByFlight_Airline_IdAndFlight_FlightNumberAndFareTypeAndSeatClass(
           form.getAirlineId(), form.getFlightNumber(), 0, form.getFlightClass(i)).orElse(null);
       if (fare == null) {
         return null;
@@ -343,7 +343,7 @@ public class ReservationsService {
       LocalDate departureDate) {
     OffsetDateTime start = departureDate.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
     OffsetDateTime end = departureDate.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toOffsetDateTime();
-    return stopsAtRepository.existsByFlightAirline_IdAndFlightFlightNumberAndStopNumberAndDepartureTimeBetween(
+    return stopsAtRepository.existsByFlight_Airline_IdAndFlight_FlightNumberAndStopNumberAndDepartureTimeBetween(
         airlineId, flightNumber, originStop, start, end);
   }
 

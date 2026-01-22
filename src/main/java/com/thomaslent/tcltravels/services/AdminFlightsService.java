@@ -55,7 +55,7 @@ public class AdminFlightsService {
 
   public List<FlightStopView> getFlightStops(String airlineId, Integer flightNumber) {
     List<StopsAt> stops = stopsAtRepository
-        .findByFlightAirline_IdAndFlightFlightNumberOrderByStopNumber(airlineId, flightNumber);
+        .findByFlight_Airline_IdAndFlight_FlightNumberOrderByStopNumber(airlineId, flightNumber);
     return stops.stream().map(this::toStopView).collect(Collectors.toList());
   }
 
@@ -104,7 +104,7 @@ public class AdminFlightsService {
   private FlightActivityView buildActivityWithStops(String airlineId, String airlineName, Integer flightNumber,
       Integer numberOfSeats, String daysOperating, Long reservationCount) {
     List<StopsAt> stops = stopsAtRepository
-        .findByFlightAirline_IdAndFlightFlightNumberOrderByStopNumber(airlineId, flightNumber);
+        .findByFlight_Airline_IdAndFlight_FlightNumberOrderByStopNumber(airlineId, flightNumber);
     StopsAt origin = stops.isEmpty() ? null : stops.get(0);
     StopsAt destination = stops.isEmpty() ? null : stops.get(stops.size() - 1);
 

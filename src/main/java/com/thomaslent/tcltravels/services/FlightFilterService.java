@@ -49,11 +49,11 @@ public class FlightFilterService {
 
     List<StopsAt> stops;
     if (beforeLocal == null) {
-      stops = stopsAtRepository.findByFlightAirline_IdAndAirport_IdAndDepartureTimeGreaterThanEqual(
+      stops = stopsAtRepository.findByFlight_Airline_IdAndAirport_IdAndDepartureTimeGreaterThanEqual(
           airlineFilter, airportFilter, afterOffset);
     } else {
       OffsetDateTime beforeOffset = beforeLocal.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toOffsetDateTime();
-      stops = stopsAtRepository.findByFlightAirline_IdAndAirport_IdAndDepartureTimeBetween(
+      stops = stopsAtRepository.findByFlight_Airline_IdAndAirport_IdAndDepartureTimeBetween(
           airlineFilter, airportFilter, afterOffset, beforeOffset);
     }
 

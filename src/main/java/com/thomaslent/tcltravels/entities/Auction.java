@@ -30,14 +30,12 @@ public class Auction {
   private Boolean accepted;
 
   @ManyToOne
-  @JoinColumn(name = "account_number", referencedColumnName = "account_number")
+  @JoinColumn(name = "customer_id", referencedColumnName = "id")
   private Customer customer;
 
-  @Column(name = "airline_id", length = 2)
-  private String airlineId;
-
-  @Column(name = "flight_number")
-  private Integer flightNumber;
+  @ManyToOne
+  @JoinColumn(name = "flight_id", referencedColumnName = "id")
+  private Flight flight;
 
   public Long getId() {
     return id;
@@ -87,20 +85,12 @@ public class Auction {
     this.customer = customer;
   }
 
-  public String getAirlineId() {
-    return airlineId;
+  public Flight getFlight() {
+    return flight;
   }
 
-  public void setAirlineId(String airlineId) {
-    this.airlineId = airlineId;
-  }
-
-  public Integer getFlightNumber() {
-    return flightNumber;
-  }
-
-  public void setFlightNumber(Integer flightNumber) {
-    this.flightNumber = flightNumber;
+  public void setFlight(Flight flight) {
+    this.flight = flight;
   }
 
 }

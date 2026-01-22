@@ -197,8 +197,8 @@
             <select name="customer">
               <option
                 th:each="c : ${customerOptions}"
-                th:value="${c.accountNumber()}"
-                th:selected="${selectedCustomer == c.accountNumber()}"
+                th:value="${c.customerId()}"
+                th:selected="${selectedCustomer == c.customerId()}"
                 th:text="${c.firstName() + ' ' + c.lastName()}"
               ></option>
             </select>

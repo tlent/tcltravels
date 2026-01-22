@@ -17,7 +17,7 @@ public class Passenger {
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "account_number", referencedColumnName = "account_number")
+  @JoinColumn(name = "customer_id", referencedColumnName = "id")
   private Customer customer;
 
   @Column(name = "passenger_name")

@@ -18,31 +18,29 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                         SELECT DISTINCT r.*
                         FROM reservations r
                         LEFT JOIN legs l
-                        ON r.reservation_number = l.reservation_number
+                        ON r.id = l.reservation_id
                         JOIN stops_at s
-                        ON s.airline_id = l.airline_id
-                        AND s.flight_number = l.flight_number
+                        ON s.flight_id = l.flight_id
                         AND s.stop_number = l.from_stop_number
                         WHERE s.departure_time >= NOW()
-                        AND r.account_number = :accountNumber
+                        AND r.customer_id = :customerId
                         ORDER BY r.reservation_date DESC
                         """, nativeQuery = true)
-        public List<Reservation> findCurrentReservations(@Param("accountNumber") Long accountNumber);
+        public List<Reservation> findCurrentReservations(@Param("customerId") Long customerId);
 
         @Query(value = """
                         SELECT DISTINCT r.*
                         FROM reservations r
                         LEFT JOIN legs l
-                        ON r.reservation_number = l.reservation_number
+                        ON r.id = l.reservation_id
                         JOIN stops_at s
-                        ON s.airline_id = l.airline_id
-                        AND s.flight_number = l.flight_number
+                        ON s.flight_id = l.flight_id
                         AND s.stop_number = l.from_stop_number
                         WHERE s.departure_time < NOW()
-                        AND r.account_number = :accountNumber
+                        AND r.customer_id = :customerId
                         ORDER BY r.reservation_date DESC
                         """, nativeQuery = true)
-        public List<Reservation> findPastReservations(@Param("accountNumber") Long accountNumber);
+        public List<Reservation> findPastReservations(@Param("customerId") Long customerId);
 
         List<Reservation> findByReservationDateBetweenOrderByTotalFareDesc(
                         OffsetDateTime start, OffsetDateTime end);
@@ -55,21 +53,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         BigDecimal sumTotalFareByReservationDateBetween(@Param("start") OffsetDateTime start,
                         @Param("end") OffsetDateTime end);
 
-        List<Reservation> findByCustomerAccountNumberOrderByTotalFareDesc(Long accountNumber);
+        List<Reservation> findByCustomerIdOrderByTotalFareDesc(Long customerId);
 
         @Query("""
                         select sum(r.totalFare)
                         from Reservation r
-                        where r.customer.accountNumber = :accountNumber
+                        where r.customer.id = :customerId
                         """)
-        BigDecimal sumTotalFareByCustomerAccountNumber(@Param("accountNumber") Long accountNumber);
+        BigDecimal sumTotalFareByCustomerId(@Param("customerId") Long customerId);
 
         @Query("""
                         select distinct r
                         from Reservation r
                         join Leg l on l.reservation = r
-                        where l.flight.id.airlineId = :airlineId
-                        and l.flight.id.flightNumber = :flightNumber
+                        where l.flight.airline.id = :airlineId
+                        and l.flight.flightNumber = :flightNumber
                         order by r.totalFare desc
                         """)
         List<Reservation> findByFlight(@Param("airlineId") String airlineId,
@@ -79,8 +77,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                         select sum(r.totalFare)
                         from Reservation r
                         join Leg l on l.reservation = r
-                        where l.flight.id.airlineId = :airlineId
-                        and l.flight.id.flightNumber = :flightNumber
+                        where l.flight.airline.id = :airlineId
+                        and l.flight.flightNumber = :flightNumber
                         """)
         BigDecimal sumTotalFareByFlight(@Param("airlineId") String airlineId,
                         @Param("flightNumber") Integer flightNumber);
@@ -93,7 +91,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                         )
                         from Reservation r
                         join r.customer c
-                        join c.person p
+                        join c.account a
+                        join a.person p
                         group by p.id, p.firstName, p.lastName
                         order by sum(r.totalFare) desc
                         """)
@@ -107,8 +106,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                         )
                         from Reservation r
                         join r.employee e
-                        join e.person p
-                        where e.isManager = false
+                        join e.account a
+                        join a.person p
+                        where a.role = 'EMPLOYEE'
                         group by p.id, p.firstName, p.lastName
                         order by sum(r.totalFare) desc
                         """)
@@ -116,17 +116,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
         @Query("""
                         select distinct new com.thomaslent.tcltravels.dto.SalesCityReservationView(
-                          r.reservationNumber,
-                          l.flight.id.airlineId,
-                          l.flight.id.flightNumber,
+                          r.id,
+                          l.flight.airline.id,
+                          l.flight.flightNumber,
                           r.reservationDate,
                           r.bookingFee,
                           r.totalFare
                         )
                         from Reservation r
                         join Leg l on l.reservation = r
-                        join StopsAt s on s.id.flightId = l.flight.id
-                          and s.id.stopNumber = l.fromStopNumber + 1
+                        join StopsAt s on s.flight = l.flight
+                          and s.stopNumber = l.fromStopNumber + 1
                         join s.airport a
                         where a.city = :city
                         order by r.totalFare desc

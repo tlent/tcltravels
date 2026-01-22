@@ -87,7 +87,7 @@ public class AdminController {
     List<CustomerOptionView> customerOptions = adminReportingService.getCustomerOptions();
     Long selectedCustomer = selectCustomerId(customerId, customerOptions);
     String selectedCustomerName = customerOptions.stream()
-        .filter(option -> option.accountNumber().equals(selectedCustomer))
+        .filter(option -> option.customerId().equals(selectedCustomer))
         .map(option -> option.firstName() + " " + option.lastName())
         .findFirst()
         .orElse("");
@@ -143,7 +143,7 @@ public class AdminController {
     List<CustomerOptionView> customerOptions = adminReportingService.getCustomerOptions();
     Long selectedCustomer = selectCustomerId(customerId, customerOptions);
     String selectedCustomerName = customerOptions.stream()
-        .filter(option -> option.accountNumber().equals(selectedCustomer))
+        .filter(option -> option.customerId().equals(selectedCustomer))
         .map(option -> option.firstName() + " " + option.lastName())
         .findFirst()
         .orElse("");
@@ -232,7 +232,7 @@ public class AdminController {
     if (options.isEmpty()) {
       return 0L;
     }
-    return options.get(0).accountNumber();
+    return options.get(0).customerId();
   }
 
   private String selectCity(String city, List<String> options) {

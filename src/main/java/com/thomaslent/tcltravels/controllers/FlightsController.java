@@ -41,8 +41,8 @@ public class FlightsController {
         airlineFilter, airportFilter, afterLocal, beforeLocal);
     model.addAttribute("filter", filterResult);
 
-    Long accountNumber = principal.getAccountNumber();
-    List<FlightView> recommendedFlights = flightsService.getRecommendedFlights(accountNumber);
+    Long customerId = principal.getCustomerId();
+    List<FlightView> recommendedFlights = flightsService.getRecommendedFlights(customerId);
     model.addAttribute("recommended_flights", recommendedFlights);
 
     List<FlightView> bestSellingFlights = flightsService.getBestSellingFlights();

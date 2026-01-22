@@ -1,8 +1,10 @@
 package com.thomaslent.tcltravels.entities;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -10,15 +12,16 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "reservation_passengers")
 public class ReservationPassenger {
-  @EmbeddedId
-  private ReservationPassengerId id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "reservation_number", referencedColumnName = "reservation_number", insertable = false, updatable = false)
+  @JoinColumn(name = "reservation_id", referencedColumnName = "id")
   private Reservation reservation;
 
   @ManyToOne
-  @JoinColumn(name = "passenger_id", referencedColumnName = "id", insertable = false, updatable = false)
+  @JoinColumn(name = "passenger_id", referencedColumnName = "id")
   private Passenger passenger;
 
   @Column(name = "seat_number")
@@ -30,11 +33,11 @@ public class ReservationPassenger {
   @Column(name = "meal")
   private String meal;
 
-  public ReservationPassengerId getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(ReservationPassengerId id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

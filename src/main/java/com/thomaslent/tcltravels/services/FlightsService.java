@@ -18,8 +18,8 @@ public class FlightsService {
     this.flightRepository = flightRepository;
   }
 
-  public List<FlightView> getRecommendedFlights(Long accountNumber) {
-    List<FlightRecommendationRow> flightRecommendationRows = flightRepository.findRecommendedFlights(accountNumber);
+  public List<FlightView> getRecommendedFlights(Long customerId) {
+    List<FlightRecommendationRow> flightRecommendationRows = flightRepository.findRecommendedFlights(customerId);
     return flightRecommendationRows.stream().map(row -> new FlightView(
         row.getAirlineId(), row.getFlightNumber(), row.getNumberOfSeats(), formatDaysOperating(row.getDaysOperating()),
         row.getOriginId(), row.getOriginCity(), row.getDestinationId(), row.getDestinationCity()))

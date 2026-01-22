@@ -151,7 +151,7 @@
               </tr>
               <tr th:each="c : ${customersOnFlight}">
                 <td th:text="${c.reservationNumber()}">0</td>
-                <td th:text="${c.accountNumber()}">0</td>
+                <td th:text="${c.customerId()}">0</td>
                 <td th:text="${c.passengerName()}">Passenger</td>
                 <td th:text="${c.seatClass()}">Class</td>
                 <td class="align_right" th:text="${c.passengerCount()}">0</td>

@@ -7,11 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.thomaslent.tcltravels.entities.Customer;
-import com.thomaslent.tcltravels.entities.Person;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-  public Optional<Customer> findByPerson(Person person);
+  Optional<Customer> findByAccountId(Long accountId);
 
-  List<Customer> findAllByOrderByPersonLastNameAscPersonFirstNameAsc();
+  Optional<Customer> findByAccountPersonId(Long personId);
+
+  List<Customer> findAllByOrderByAccountPersonLastNameAscAccountPersonFirstNameAsc();
 }

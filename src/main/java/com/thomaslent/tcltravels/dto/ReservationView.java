@@ -6,7 +6,7 @@ import java.util.List;
 
 public record ReservationView(
     Long reservationNumber,
-    Long accountNumber,
+    Long customerId,
     OffsetDateTime reservationDate,
     BigDecimal bookingFee,
     BigDecimal totalFare,

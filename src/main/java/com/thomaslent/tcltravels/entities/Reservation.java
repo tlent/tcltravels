@@ -17,8 +17,7 @@ import jakarta.persistence.Table;
 public class Reservation {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "reservation_number")
-  private Long reservationNumber;
+  private Long id;
 
   @Column(name = "reservation_date")
   private OffsetDateTime reservationDate;
@@ -30,19 +29,19 @@ public class Reservation {
   private BigDecimal totalFare;
 
   @ManyToOne
-  @JoinColumn(name = "employee_ssn", referencedColumnName = "ssn")
+  @JoinColumn(name = "employee_id", referencedColumnName = "id")
   private Employee employee;
 
   @ManyToOne
-  @JoinColumn(name = "account_number", referencedColumnName = "account_number")
+  @JoinColumn(name = "customer_id", referencedColumnName = "id")
   private Customer customer;
 
-  public Long getReservationNumber() {
-    return reservationNumber;
+  public Long getId() {
+    return id;
   }
 
-  public void setReservationNumber(Long reservationNumber) {
-    this.reservationNumber = reservationNumber;
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public OffsetDateTime getReservationDate() {

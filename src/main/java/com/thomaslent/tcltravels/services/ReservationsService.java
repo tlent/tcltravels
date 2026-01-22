@@ -25,18 +25,14 @@ import com.thomaslent.tcltravels.dto.StopView;
 import com.thomaslent.tcltravels.entities.Auction;
 import com.thomaslent.tcltravels.entities.Customer;
 import com.thomaslent.tcltravels.entities.CustomerPreference;
-import com.thomaslent.tcltravels.entities.CustomerPreferenceId;
 import com.thomaslent.tcltravels.entities.Employee;
 import com.thomaslent.tcltravels.entities.Fare;
 import com.thomaslent.tcltravels.entities.Flight;
-import com.thomaslent.tcltravels.entities.FlightId;
 import com.thomaslent.tcltravels.entities.Leg;
-import com.thomaslent.tcltravels.entities.LegId;
 import com.thomaslent.tcltravels.entities.Passenger;
 import com.thomaslent.tcltravels.entities.Person;
 import com.thomaslent.tcltravels.entities.Reservation;
 import com.thomaslent.tcltravels.entities.ReservationPassenger;
-import com.thomaslent.tcltravels.entities.ReservationPassengerId;
 import com.thomaslent.tcltravels.entities.StopsAt;
 import com.thomaslent.tcltravels.repositories.AdvancePurchaseDiscountRepository;
 import com.thomaslent.tcltravels.repositories.AuctionRepository;
@@ -55,7 +51,7 @@ import com.thomaslent.tcltravels.repositories.StopsAtRepository;
 @Service
 public class ReservationsService {
   private static final BigDecimal BOOKING_FEE = new BigDecimal("30.00");
-  private static final int DEFAULT_EMPLOYEE_SSN = 123456789;
+  private static final long DEFAULT_EMPLOYEE_ID = 1L;
   private ReservationRepository reservationRepository;
   private LegRepository legRepository;
   private StopsAtRepository stopsAtRepository;
@@ -91,19 +87,19 @@ public class ReservationsService {
     this.auctionRepository = auctionRepository;
   }
 
-  public List<ReservationView> getCurrentReservations(Long accountNumber) {
-    List<Reservation> currentReservations = reservationRepository.findCurrentReservations(accountNumber);
+  public List<ReservationView> getCurrentReservations(Long customerId) {
+    List<Reservation> currentReservations = reservationRepository.findCurrentReservations(customerId);
     return buildReservationViews(currentReservations);
   }
 
-  public List<ReservationView> getPastReservations(Long accountNumber) {
-    List<Reservation> pastReservations = reservationRepository.findPastReservations(accountNumber);
+  public List<ReservationView> getPastReservations(Long customerId) {
+    List<Reservation> pastReservations = reservationRepository.findPastReservations(customerId);
     return buildReservationViews(pastReservations);
   }
 
   private List<ReservationView> buildReservationViews(List<Reservation> reservations) {
     List<Long> reservationNumbers = reservations.stream()
-        .map(reservation -> reservation.getReservationNumber()).collect(Collectors.toList());
+        .map(Reservation::getId).collect(Collectors.toList());
     List<ReservationLegRow> legRows = reservationNumbers.isEmpty() ? List.of()
         : legRepository.getReservationLegs(reservationNumbers);
     Map<Long, List<LegView>> legViewsByReservation = new HashMap<>();
@@ -118,22 +114,22 @@ public class ReservationsService {
               departureTime, arrivalTime));
     }
     return reservations.stream()
-        .map(reservation -> new ReservationView(reservation.getReservationNumber(),
-            reservation.getCustomer().getAccountNumber(), reservation.getReservationDate(),
+        .map(reservation -> new ReservationView(reservation.getId(),
+            reservation.getCustomer().getId(), reservation.getReservationDate(),
             reservation.getBookingFee(),
             reservation.getTotalFare(),
-            legViewsByReservation.getOrDefault(reservation.getReservationNumber(), List.of())))
+            legViewsByReservation.getOrDefault(reservation.getId(), List.of())))
         .collect(Collectors.toList());
   }
 
   public List<StopView> getStopsForFlight(String airlineId, Integer flightNumber) {
-    return stopsAtRepository.findByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumber(
+    return stopsAtRepository.findByFlightAirline_IdAndFlightFlightNumberOrderByStopNumber(
         airlineId, flightNumber).stream()
         .map(stop -> new StopView(
-            stop.getId().getFlightId().getAirlineId(),
+            stop.getFlight().getAirline().getId(),
             stop.getAirport().getId(),
-            stop.getId().getFlightId().getFlightNumber(),
-            stop.getId().getStopNumber(),
+            stop.getFlight().getFlightNumber(),
+            stop.getStopNumber(),
             stop.getArrivalTime(),
             stop.getDepartureTime(),
             stop.getDepartureTime() == null ? null : stop.getDepartureTime().toLocalDate()))
@@ -144,7 +140,7 @@ public class ReservationsService {
     OffsetDateTime departure = null;
     if (airlineId != null && flightNumber != null) {
       var stop = stopsAtRepository
-          .findFirstByIdFlightIdAirlineIdAndIdFlightIdFlightNumberAndIdStopNumberOrderByDepartureTimeAsc(
+          .findFirstByFlightAirline_IdAndFlightFlightNumberAndStopNumberOrderByDepartureTimeAsc(
               airlineId, flightNumber, 1);
       if (stop != null) {
         departure = stop.getDepartureTime();
@@ -154,7 +150,7 @@ public class ReservationsService {
   }
 
   @Transactional
-  public Optional<String> createReservation(ReservationForm form, Long accountNumber) {
+  public Optional<String> createReservation(ReservationForm form, Long customerId) {
     if (form.getOrigin() != null && form.getDestination() != null && form.getOrigin() >= form.getDestination()) {
       return Optional.of("Invalid origin and destination.");
     }
@@ -169,7 +165,7 @@ public class ReservationsService {
       return Optional.of("Fare information is unavailable for this flight.");
     }
 
-    Optional<Reservation> reservationOpt = createReservationRecord(accountNumber, totalCost);
+    Optional<Reservation> reservationOpt = createReservationRecord(customerId, totalCost);
     if (reservationOpt.isEmpty()) {
       return Optional.of("Reservation could not be created.");
     }
@@ -181,21 +177,18 @@ public class ReservationsService {
     Flight flight = flightOpt.get();
     insertLegs(reservation, flight, form.getOrigin(), form.getDestination());
 
+    Customer customer = customerRepository.findById(customerId).orElse(null);
+    if (customer == null) {
+      return Optional.of("Account information is missing.");
+    }
     int seatNumber = (int) reservationPassengerRepository
         .countSeatsForFlight(form.getAirlineId(), form.getFlightNumber()) + 1;
     if (form.getOther() != null && !form.getOther().isBlank()
-        && !customerPreferenceRepository.existsByIdAccountNumberAndIdPreference(accountNumber, form.getOther())) {
-      CustomerPreferenceId preferenceId = new CustomerPreferenceId();
-      preferenceId.setAccountNumber(accountNumber);
-      preferenceId.setPreference(form.getOther());
+        && !customerPreferenceRepository.existsByCustomerIdAndPreference(customerId, form.getOther())) {
       CustomerPreference preference = new CustomerPreference();
-      preference.setId(preferenceId);
+      preference.setCustomer(customer);
+      preference.setPreference(form.getOther());
       customerPreferenceRepository.save(preference);
-    }
-
-    Customer customer = customerRepository.findById(accountNumber).orElse(null);
-    if (customer == null) {
-      return Optional.of("Account information is missing.");
     }
 
     for (int i = 1; i <= form.getPassengerCount(); i++) {
@@ -207,12 +200,9 @@ public class ReservationsService {
       passenger.setPassengerName(passengerName);
       passenger = passengerRepository.save(passenger);
 
-      ReservationPassengerId id = new ReservationPassengerId();
-      id.setReservationNumber(reservation.getReservationNumber());
-      id.setPassengerId(passenger.getId());
-      id.setAccountNumber(accountNumber);
       ReservationPassenger reservationPassenger = new ReservationPassenger();
-      reservationPassenger.setId(id);
+      reservationPassenger.setReservation(reservation);
+      reservationPassenger.setPassenger(passenger);
       reservationPassenger.setSeatNumber(seatNumber);
       reservationPassenger.setSeatClass(form.getFlightClass(i));
       reservationPassenger.setMeal(form.getFood(i));
@@ -224,14 +214,14 @@ public class ReservationsService {
   }
 
   @Transactional
-  public BidResult submitBid(BidForm form, Long accountNumber, Long personId) {
+  public BidResult submitBid(BidForm form, Long customerId, Long personId) {
     Optional<String> dateError = validateDepartureDate(form.getAirlineId(), form.getFlightNumber(),
         1, form.getDepartureDate());
     if (dateError.isPresent()) {
       return new BidResult(false, false, dateError.get());
     }
 
-    Fare hiddenFare = fareRepository.findByIdAirlineIdAndIdFlightNumberAndIdFareTypeAndIdSeatClass(
+    Fare hiddenFare = fareRepository.findByFlightAirline_IdAndFlightFlightNumberAndFareTypeAndSeatClass(
         form.getAirlineId(), form.getFlightNumber(), 2, form.getFlightClass()).orElse(null);
     if (hiddenFare == null) {
       return new BidResult(false, false, "Fare information is unavailable for this flight.");
@@ -242,18 +232,18 @@ public class ReservationsService {
         .setScale(2, RoundingMode.HALF_UP);
 
     if (form.getBid().compareTo(fare) <= 0) {
-      if (!createAuction(accountNumber, form, false)) {
+      if (!createAuction(customerId, form, false)) {
         return new BidResult(false, false, "Auction could not be saved.");
       }
       return new BidResult(false, true, null);
     }
 
-    if (!createAuction(accountNumber, form, true)) {
+    if (!createAuction(customerId, form, true)) {
       return new BidResult(false, false, "Auction could not be saved.");
     }
 
     StopsAt lastStop = stopsAtRepository
-        .findTopByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumberDesc(
+        .findTopByFlightAirline_IdAndFlightFlightNumberOrderByStopNumberDesc(
             form.getAirlineId(), form.getFlightNumber());
     if (lastStop == null) {
       return new BidResult(false, false, "Flight stops could not be loaded.");
@@ -264,7 +254,7 @@ public class ReservationsService {
       return new BidResult(false, false, "Account information is missing.");
     }
 
-    Optional<Reservation> reservationOpt = createReservationRecord(accountNumber, form.getBid());
+    Optional<Reservation> reservationOpt = createReservationRecord(customerId, form.getBid());
     if (reservationOpt.isEmpty()) {
       return new BidResult(false, false, "Reservation could not be created.");
     }
@@ -274,21 +264,18 @@ public class ReservationsService {
       return new BidResult(false, false, "Flight information is unavailable.");
     }
     Flight flight = flightOpt.get();
-    insertLegs(reservation, flight, 1, lastStop.getId().getStopNumber());
+    insertLegs(reservation, flight, 1, lastStop.getStopNumber());
 
-    if (form.getOther() != null && !form.getOther().isBlank()
-        && !customerPreferenceRepository.existsByIdAccountNumberAndIdPreference(accountNumber, form.getOther())) {
-      CustomerPreferenceId preferenceId = new CustomerPreferenceId();
-      preferenceId.setAccountNumber(accountNumber);
-      preferenceId.setPreference(form.getOther());
-      CustomerPreference preference = new CustomerPreference();
-      preference.setId(preferenceId);
-      customerPreferenceRepository.save(preference);
-    }
-
-    Customer customer = customerRepository.findById(accountNumber).orElse(null);
+    Customer customer = customerRepository.findById(customerId).orElse(null);
     if (customer == null) {
       return new BidResult(false, false, "Account information is missing.");
+    }
+    if (form.getOther() != null && !form.getOther().isBlank()
+        && !customerPreferenceRepository.existsByCustomerIdAndPreference(customerId, form.getOther())) {
+      CustomerPreference preference = new CustomerPreference();
+      preference.setCustomer(customer);
+      preference.setPreference(form.getOther());
+      customerPreferenceRepository.save(preference);
     }
 
     int seatNumber = (int) reservationPassengerRepository
@@ -299,12 +286,9 @@ public class ReservationsService {
     passenger.setPassengerName(passengerName);
     passenger = passengerRepository.save(passenger);
 
-    ReservationPassengerId id = new ReservationPassengerId();
-    id.setReservationNumber(reservation.getReservationNumber());
-    id.setPassengerId(passenger.getId());
-    id.setAccountNumber(accountNumber);
     ReservationPassenger reservationPassenger = new ReservationPassenger();
-    reservationPassenger.setId(id);
+    reservationPassenger.setReservation(reservation);
+    reservationPassenger.setPassenger(passenger);
     reservationPassenger.setSeatNumber(seatNumber);
     reservationPassenger.setSeatClass(form.getFlightClass());
     reservationPassenger.setMeal(form.getFood());
@@ -331,7 +315,7 @@ public class ReservationsService {
   private BigDecimal calculateFareTotal(ReservationForm form) {
     BigDecimal totalFares = BigDecimal.ZERO;
     for (int i = 1; i <= form.getPassengerCount(); i++) {
-      Fare fare = fareRepository.findByIdAirlineIdAndIdFlightNumberAndIdFareTypeAndIdSeatClass(
+      Fare fare = fareRepository.findByFlightAirline_IdAndFlightFlightNumberAndFareTypeAndSeatClass(
           form.getAirlineId(), form.getFlightNumber(), 0, form.getFlightClass(i)).orElse(null);
       if (fare == null) {
         return null;
@@ -347,7 +331,7 @@ public class ReservationsService {
   private BigDecimal getDiscountRate(String airlineId, LocalDate departureDate) {
     long days = ChronoUnit.DAYS.between(LocalDate.now(), departureDate);
     var discount = discountRepository
-        .findTopByIdAirlineIdAndIdDaysLessThanEqualOrderByIdDaysDesc(airlineId, (int) days)
+        .findTopByAirline_IdAndDaysLessThanEqualOrderByDaysDesc(airlineId, (int) days)
         .orElse(null);
     if (discount == null || discount.getDiscountRate() == null) {
       return BigDecimal.ZERO;
@@ -359,13 +343,13 @@ public class ReservationsService {
       LocalDate departureDate) {
     OffsetDateTime start = departureDate.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
     OffsetDateTime end = departureDate.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toOffsetDateTime();
-    return stopsAtRepository.existsByIdFlightIdAirlineIdAndIdFlightIdFlightNumberAndIdStopNumberAndDepartureTimeBetween(
+    return stopsAtRepository.existsByFlightAirline_IdAndFlightFlightNumberAndStopNumberAndDepartureTimeBetween(
         airlineId, flightNumber, originStop, start, end);
   }
 
-  private Optional<Reservation> createReservationRecord(Long accountNumber, BigDecimal totalFare) {
-    Customer customer = customerRepository.findById(accountNumber).orElse(null);
-    Employee employee = employeeRepository.findById(DEFAULT_EMPLOYEE_SSN).orElse(null);
+  private Optional<Reservation> createReservationRecord(Long customerId, BigDecimal totalFare) {
+    Customer customer = customerRepository.findById(customerId).orElse(null);
+    Employee employee = employeeRepository.findById(DEFAULT_EMPLOYEE_ID).orElse(null);
     if (customer == null || employee == null) {
       return Optional.empty();
     }
@@ -379,20 +363,14 @@ public class ReservationsService {
   }
 
   private Optional<Flight> loadFlight(String airlineId, Integer flightNumber) {
-    FlightId id = new FlightId();
-    id.setAirlineId(airlineId);
-    id.setFlightNumber(flightNumber);
-    return flightRepository.findById(id);
+    return flightRepository.findByAirline_IdAndFlightNumber(airlineId, flightNumber);
   }
 
   private void insertLegs(Reservation reservation, Flight flight, Integer originStop, Integer destinationStop) {
     int legNumber = 1;
     for (int stop = originStop; stop < destinationStop; stop++) {
       Leg leg = new Leg();
-      LegId legId = new LegId();
-      legId.setReservationNumber(reservation.getReservationNumber());
-      legId.setLegNumber(legNumber);
-      leg.setId(legId);
+      leg.setLegNumber(legNumber);
       leg.setReservation(reservation);
       leg.setFlight(flight);
       leg.setFromStopNumber(stop);
@@ -401,15 +379,18 @@ public class ReservationsService {
     }
   }
 
-  private boolean createAuction(Long accountNumber, BidForm form, boolean accepted) {
-    Customer customer = customerRepository.findById(accountNumber).orElse(null);
+  private boolean createAuction(Long customerId, BidForm form, boolean accepted) {
+    Customer customer = customerRepository.findById(customerId).orElse(null);
     if (customer == null) {
+      return false;
+    }
+    Flight flight = loadFlight(form.getAirlineId(), form.getFlightNumber()).orElse(null);
+    if (flight == null) {
       return false;
     }
     Auction auction = new Auction();
     auction.setCustomer(customer);
-    auction.setAirlineId(form.getAirlineId());
-    auction.setFlightNumber(form.getFlightNumber());
+    auction.setFlight(flight);
     auction.setSeatingClass(form.getFlightClass());
     auction.setDate(LocalDate.now());
     auction.setNameYourOwnPrice(form.getBid());

@@ -1,48 +1,40 @@
 package com.thomaslent.tcltravels.entities;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "legs")
 public class Leg {
-  @EmbeddedId
-  private LegId id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @ManyToOne
-  @MapsId("reservationNumber")
-  @JoinColumn(name = "reservation_number", referencedColumnName = "reservation_number")
+  @JoinColumn(name = "reservation_id", referencedColumnName = "id")
   private Reservation reservation;
 
-  @ManyToOne
-  @JoinColumns({
-      @JoinColumn(name = "airline_id", referencedColumnName = "airline_id"),
-      @JoinColumn(name = "flight_number", referencedColumnName = "flight_number")
-  })
-  private Flight flight;
+  @Column(name = "leg_number")
+  private Integer legNumber;
 
   @ManyToOne
-  @JoinColumns({
-      @JoinColumn(name = "airline_id", referencedColumnName = "airline_id", insertable = false, updatable = false),
-      @JoinColumn(name = "flight_number", referencedColumnName = "flight_number", insertable = false, updatable = false),
-      @JoinColumn(name = "from_stop_number", referencedColumnName = "stop_number", insertable = false, updatable = false)
-  })
-  private StopsAt fromStop;
+  @JoinColumn(name = "flight_id", referencedColumnName = "id")
+  private Flight flight;
 
   @Column(name = "from_stop_number")
   private Integer fromStopNumber;
 
-  public LegId getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(LegId id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -54,20 +46,20 @@ public class Leg {
     this.reservation = reservation;
   }
 
+  public Integer getLegNumber() {
+    return legNumber;
+  }
+
+  public void setLegNumber(Integer legNumber) {
+    this.legNumber = legNumber;
+  }
+
   public Flight getFlight() {
     return flight;
   }
 
   public void setFlight(Flight flight) {
     this.flight = flight;
-  }
-
-  public StopsAt getFromStop() {
-    return fromStop;
-  }
-
-  public void setFromStop(StopsAt fromStop) {
-    this.fromStop = fromStop;
   }
 
   public Integer getFromStopNumber() {

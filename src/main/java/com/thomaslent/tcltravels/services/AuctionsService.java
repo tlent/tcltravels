@@ -17,10 +17,12 @@ public class AuctionsService {
     this.auctionRepository = auctionRepository;
   }
 
-  public List<AuctionView> getAuctionHistory(Long accountNumber) {
-    List<Auction> auctions = auctionRepository.findByCustomer_AccountNumberOrderByDateDesc(accountNumber);
+  public List<AuctionView> getAuctionHistory(Long customerId) {
+    List<Auction> auctions = auctionRepository.findByCustomerIdOrderByDateDesc(customerId);
     return auctions.stream()
-        .map(auction -> new AuctionView(auction.getAirlineId(), auction.getFlightNumber(),
+        .map(auction -> new AuctionView(
+            auction.getFlight().getAirline().getId(),
+            auction.getFlight().getFlightNumber(),
             auction.getSeatingClass(),
             auction.getDate(), auction.getNameYourOwnPrice(), auction.getAccepted()))
         .collect(Collectors.toList());

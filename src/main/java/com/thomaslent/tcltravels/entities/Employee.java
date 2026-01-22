@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -14,11 +16,15 @@ import jakarta.persistence.Table;
 @Table(name = "employees")
 public class Employee {
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @OneToOne
+  @JoinColumn(name = "account_id", referencedColumnName = "id")
+  private User account;
+
   @Column(nullable = false)
   private Integer ssn;
-
-  @Column(name = "is_manager")
-  private Boolean isManager;
 
   @Column(name = "start_date")
   private LocalDate startDate;
@@ -26,9 +32,21 @@ public class Employee {
   @Column(name = "hourly_rate")
   private BigDecimal hourlyRate;
 
-  @OneToOne
-  @JoinColumn(name = "id", referencedColumnName = "id")
-  private Person person;
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public User getAccount() {
+    return account;
+  }
+
+  public void setAccount(User account) {
+    this.account = account;
+  }
 
   public Integer getSsn() {
     return ssn;
@@ -36,14 +54,6 @@ public class Employee {
 
   public void setSsn(Integer ssn) {
     this.ssn = ssn;
-  }
-
-  public Boolean getIsManager() {
-    return isManager;
-  }
-
-  public void setIsManager(Boolean isManager) {
-    this.isManager = isManager;
   }
 
   public LocalDate getStartDate() {
@@ -60,14 +70,6 @@ public class Employee {
 
   public void setHourlyRate(BigDecimal hourlyRate) {
     this.hourlyRate = hourlyRate;
-  }
-
-  public Person getPerson() {
-    return person;
-  }
-
-  public void setPerson(Person person) {
-    this.person = person;
   }
 
 }

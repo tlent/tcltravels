@@ -38,14 +38,14 @@ public class ReservationsController {
     @GetMapping("/reservations")
     @PreAuthorize("hasRole('CUSTOMER')")
     public String getReservations(Model model, @AuthenticationPrincipal UserPrincipal principal) {
-        Long accountNumber = principal.getAccountNumber();
-        List<ReservationView> currentReservationViews = reservationsService.getCurrentReservations(accountNumber);
+        Long customerId = principal.getCustomerId();
+        List<ReservationView> currentReservationViews = reservationsService.getCurrentReservations(customerId);
         model.addAttribute("current_reservations", currentReservationViews);
 
-        List<ReservationView> pastReservationViews = reservationsService.getPastReservations(accountNumber);
+        List<ReservationView> pastReservationViews = reservationsService.getPastReservations(customerId);
         model.addAttribute("past_reservations", pastReservationViews);
 
-        model.addAttribute("auction_history", auctionsService.getAuctionHistory(accountNumber));
+        model.addAttribute("auction_history", auctionsService.getAuctionHistory(customerId));
 
         return "reservations/index";
     }
@@ -101,8 +101,8 @@ public class ReservationsController {
             return "reservations/new";
         }
 
-        Long accountNumber = principal.getAccountNumber();
-        reservationsService.createReservation(reservationForm, accountNumber)
+        Long customerId = principal.getCustomerId();
+        reservationsService.createReservation(reservationForm, customerId)
             .ifPresent(error -> bindingResult.reject("reservationForm", error));
 
         if (bindingResult.hasErrors()) {
@@ -121,9 +121,9 @@ public class ReservationsController {
             return "reservations/bid";
         }
 
-        Long accountNumber = principal.getAccountNumber();
+        Long customerId = principal.getCustomerId();
         Long personId = principal.getPersonId();
-        ReservationsService.BidResult result = reservationsService.submitBid(bidForm, accountNumber, personId);
+        ReservationsService.BidResult result = reservationsService.submitBid(bidForm, customerId, personId);
         if (result.error() != null) {
             bindingResult.reject("bidForm", result.error());
             return "reservations/bid";

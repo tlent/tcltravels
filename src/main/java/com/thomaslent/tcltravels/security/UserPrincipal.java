@@ -6,8 +6,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserPrincipal implements UserDetails {
+  private final Long userId;
   private final Long personId;
-  private final Long accountNumber;
+  private final Long customerId;
   private final String firstName;
   private final String lastName;
   private final String username;
@@ -15,11 +16,12 @@ public class UserPrincipal implements UserDetails {
   private final String roleLabel;
   private final Collection<? extends GrantedAuthority> authorities;
 
-  public UserPrincipal(Long personId, Long accountNumber, String firstName, String lastName,
+  public UserPrincipal(Long userId, Long personId, Long customerId, String firstName, String lastName,
       String username, String password, String roleLabel,
       Collection<? extends GrantedAuthority> authorities) {
+    this.userId = userId;
     this.personId = personId;
-    this.accountNumber = accountNumber;
+    this.customerId = customerId;
     this.firstName = firstName;
     this.lastName = lastName;
     this.username = username;
@@ -28,12 +30,16 @@ public class UserPrincipal implements UserDetails {
     this.authorities = authorities;
   }
 
+  public Long getUserId() {
+    return userId;
+  }
+
   public Long getPersonId() {
     return personId;
   }
 
-  public Long getAccountNumber() {
-    return accountNumber;
+  public Long getCustomerId() {
+    return customerId;
   }
 
   public String getFirstName() {

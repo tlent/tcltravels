@@ -73,131 +73,6 @@ VALUES
   ('TIA', 'Tokyo International', 'Tokyo', 'Japan');
 
 INSERT INTO
-  flights
-VALUES
-  ('AA', 111, 100, 1010100, NULL, NULL),
-  ('JB', 111, 150, 1111111, NULL, NULL),
-  ('AM', 1337, 33, 0000011, NULL, NULL);
-
--- 0 = One way
--- 1 = Round trip
--- 2 = Hidden fare (for reverse auctions)
-INSERT INTO
-  fares
-VALUES
-  ('AA', 111, 0, 'First', 100.00),
-  ('AA', 111, 1, 'First', 190.00),
-  ('AA', 111, 2, 'First', 80.00),
-  ('AA', 111, 0, 'Business', 50.00),
-  ('AA', 111, 1, 'Business', 80.00),
-  ('AA', 111, 2, 'Business', 30.00),
-  ('AA', 111, 0, 'Economy', 30.00),
-  ('AA', 111, 1, 'Economy', 60.00),
-  ('AA', 111, 2, 'Economy', 10.00),
-  ('JB', 111, 0, 'First', 150.00),
-  ('JB', 111, 1, 'First', 250.00),
-  ('JB', 111, 2, 'First', 140.00),
-  ('JB', 111, 0, 'Business', 100.00),
-  ('JB', 111, 1, 'Business', 170.00),
-  ('JB', 111, 2, 'Business', 90.00),
-  ('JB', 111, 0, 'Economy', 80.00),
-  ('JB', 111, 1, 'Economy', 150.00),
-  ('JB', 111, 2, 'Economy', 70.00),
-  ('AM', 1337, 0, 'First', 100.00),
-  ('AM', 1337, 1, 'First', 150.00),
-  ('AM', 1337, 2, 'First', 95.00),
-  ('AM', 1337, 0, 'Business', 75.00),
-  ('AM', 1337, 1, 'Business', 150.00),
-  ('AM', 1337, 2, 'Business', 50.00),
-  ('AM', 1337, 0, 'Economy', 55.00),
-  ('AM', 1337, 1, 'Economy', 130.00),
-  ('AM', 1337, 2, 'Economy', 30.00);
-
-INSERT INTO
-  stops_at
-VALUES
-  (
-    'AA',
-    111,
-    1,
-    'LGA',
-    '2011-01-05 09:00:00',
-    '2011-01-05 11:00:00',
-    0,
-    0
-  ),
-  (
-    'AA',
-    111,
-    2,
-    'LAX',
-    '2011-01-05 17:00:00',
-    '2011-01-05 19:00:00',
-    0,
-    0
-  ),
-  (
-    'AA',
-    111,
-    3,
-    'TIA',
-    '2011-01-06 07:30:00',
-    '2011-01-06 10:00:00',
-    0,
-    0
-  ),
-  (
-    'JB',
-    111,
-    1,
-    'SFI',
-    '2011-01-10 12:00:00',
-    '2011-01-10 14:00:00',
-    0,
-    0
-  ),
-  (
-    'JB',
-    111,
-    2,
-    'LIA',
-    '2011-01-10 19:30:00',
-    '2011-01-10 22:30:00',
-    0,
-    0
-  ),
-  (
-    'JB',
-    111,
-    3,
-    'LHA',
-    '2011-01-11 05:00:00',
-    '2011-01-11 08:00:00',
-    0,
-    0
-  ),
-  (
-    'AM',
-    1337,
-    1,
-    'JFK',
-    '2011-01-13 05:00:00',
-    '2011-01-13 07:00:00',
-    0,
-    0
-  ),
-  (
-    'AM',
-    1337,
-    2,
-    'IIA',
-    '2011-01-13 23:00:00',
-    '2011-01-14 03:00:00',
-    0,
-    0
-  );
-
-INSERT INTO
   persons
 VALUES
   (
@@ -239,172 +114,7 @@ VALUES
     'NY',
     11111,
     '1234567890'
-  );
-
-INSERT INTO
-  employees
-VALUES
-  (
-    4,
-    123456789,
-    false,
-    '1970-01-01 00:00:00',
-    50.00
-  );
-
-INSERT INTO
-  customers
-VALUES
-  (
-    1,
-    1,
-    'jdoe@woot.com',
-    '2011-04-01 16:00:00',
-    NULL
   ),
-  (
-    2,
-    2,
-    'awesomejane@ftw.com',
-    '2011-01-04 07:00:00',
-    NULL
-  ),
-  (
-    3,
-    3,
-    'rickroller@rolld.com',
-    '2011-01-01 00:00:00',
-    NULL
-  );
-
-INSERT INTO
-  passengers
-VALUES
-  (1, 1, 'John Doe'),
-  (2, 2, 'Jane Smith'),
-  (3, 3, 'Rick Astley');
-
-INSERT INTO
-  reservations
-VALUES
-  (
-    111,
-    '2011-01-01 06:00:00',
-    30.00,
-    1200.00,
-    123456789,
-    1
-  ),
-  (
-    222,
-    '2011-01-01 00:00:00',
-    30.00,
-    500.00,
-    123456789,
-    2
-  ),
-  (
-    333,
-    '2011-01-01 00:00:00',
-    30.00,
-    3333.33,
-    123456789,
-    3
-  );
-
-INSERT INTO
-  legs
-VALUES
-  (111, 1, 'AA', 111, 1),
-  (111, 2, 'AA', 111, 2),
-  (222, 1, 'JB', 111, 2),
-  (333, 1, 'AM', 1337, 1);
-
-INSERT INTO
-  reservation_passengers
-VALUES
-  (111, 1, 1, 1, 'Economy', 'Chips'),
-  (222, 2, 2, 1, 'First', 'Fish and Chips'),
-  (333, 3, 3, 1, 'First', 'Sushi');
-
-INSERT INTO
-  auctions
-VALUES
-  (
-    1,
-    1,
-    'AA',
-    111,
-    'Economy',
-    '2011-01-01',
-    400.00,
-    true
-  );
-
-INSERT INTO
-  app_users (username, password, person_id)
-VALUES
-  ('rickroller@rolld.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 3),
-  ('awesomejane@ftw.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 2),
-  ('jdoe@woot.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 1);
-
-INSERT INTO
-  passengers
-VALUES
-  (4, 1, 'Additional Passenger');
-
-INSERT INTO
-  reservation_passengers
-VALUES
-  (111, 2, 1, 1, 'Economy', 'Chips');
-
--- For best_selling_flights.sql
--- need another reservation for an existing flight to see
--- that it appears before others
-INSERT INTO
-  reservations
-VALUES
-  (
-    444,
-    '2014-01-01 00:00:00',
-    30.00,
-    500.00,
-    123456789,
-    1
-  );
-
-INSERT INTO
-  reservation_passengers
-VALUES
-  (444, 1, 1, 1, 'Business', 'Chips');
-
-INSERT INTO
-  legs
-VALUES
-  (444, 1, 'JB', 111, 1);
-
--- For bids_history
--- adding another bid on the same auction to ensure it shows all
--- bids in the correct order
-INSERT INTO
-  auctions
-VALUES
-  (
-    2,
-    2,
-    'AA',
-    '111',
-    'Economy',
-    '2011-01-01',
-    500,
-    true
-  );
-
--- For customer_rep_most_revenue
--- add another customer rep and a reservation making him have the most revenue
-INSERT INTO
-  persons
-VALUES
   (
     5,
     'BestCustomerRep',
@@ -413,135 +123,8 @@ VALUES
     'New York',
     'NY',
     11790,
-    5555555555
-  );
-
-INSERT INTO
-  employees
-VALUES
-  (5, 111111111, false, '1970-01-01 00:00:00', 1);
-
-INSERT INTO
-  reservations
-VALUES
-  (
-    999,
-    '2011-01-01 00:00:00',
-    30.00,
-    999999.00,
-    111111111,
-    1
-  );
-
-INSERT INTO
-  reservation_passengers
-VALUES
-  (999, 1, 1, 1, 'Economy', 'Steak');
-
-INSERT INTO
-  legs
-VALUES
-  (999, 1, 'JB', 111, 1);
-
--- For revenue_by_destination_city
--- Checking that reservations that end at a leg that isn't the end of the total
--- flight have their last stop as their destination city.
--- The below  should make New York have a revenue of 77777 and not change
--- London's revenue.
-INSERT INTO
-  flights
-VALUES
-  ('JB', 777, 150, 1111111, NULL, NULL);
-
-INSERT INTO
-  fares
-VALUES
-  ('JB', 777, 0, 'First', 150.00),
-  ('JB', 777, 1, 'First', 300.00),
-  ('JB', 777, 2, 'First', 125.00),
-  ('JB', 777, 0, 'Business', 125.00),
-  ('JB', 777, 1, 'Business', 200.00),
-  ('JB', 777, 2, 'Business', 100.00),
-  ('JB', 777, 0, 'Economy', 105.00),
-  ('JB', 777, 1, 'Economy', 180.00),
-  ('JB', 777, 2, 'Economy', 80.00);
-
-INSERT INTO
-  advance_purchase_discounts
-VALUES
-  ('JB', 7, 10),
-  ('AA', 14, 15);
-
-INSERT INTO
-  stops_at
-VALUES
-  (
-    'JB',
-    777,
-    1,
-    'SFI',
-    '2015-01-01 00:00:00',
-    '2015-01-01 02:00:00',
-    0,
-    0
+    '5555555555'
   ),
-  (
-    'JB',
-    777,
-    2,
-    'JFK',
-    '2015-01-01 03:00:00',
-    '2015-01-01 05:00:00',
-    0,
-    0
-  ),
-  (
-    'JB',
-    777,
-    3,
-    'LHA',
-    '2015-01-01 07:00:00',
-    '2015-01-01 10:00:00',
-    0,
-    0
-  );
-
-INSERT INTO
-  reservations
-VALUES
-  (911, NOW(), 30, 77777, 111111111, 3);
-
-INSERT INTO
-  reservation_passengers
-VALUES
-  (911, 3, 3, 1, 'First', 'Chips');
-
-INSERT INTO
-  legs
-VALUES
-  (911, 1, 'JB', 777, 1);
-
--- Checking that revenue by destination city works correctly with
--- multiple flights ending at the same city. London should have
--- two reservations.
-INSERT INTO
-  reservations
-VALUES
-  (977, NOW(), 30, 150, 111111111, 3);
-
-INSERT INTO
-  reservation_passengers
-VALUES
-  (977, 3, 3, 1, 'Economy', 'Chips');
-
-INSERT INTO
-  legs
-VALUES
-  (977, 1, 'JB', 777, 2);
-
-INSERT INTO
-  persons
-VALUES
   (
     6,
     'Lynard',
@@ -550,73 +133,167 @@ VALUES
     'Else',
     'NY',
     12345,
-    1234567899
+    '1234567899'
   );
 
 INSERT INTO
-  app_users (username, password, person_id)
+  app_users (id, username, password, role, person_id)
 VALUES
-  ('bross@email.com', 'password', 4),
-  ('best@customerreps.com', 'password', 5),
-  ('skynyrd03@freebird.com', 'password', 6);
+  (1, 'jdoe@woot.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 'CUSTOMER', 1),
+  (2, 'awesomejane@ftw.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 'CUSTOMER', 2),
+  (3, 'rickroller@rolld.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 'CUSTOMER', 3),
+  (4, 'bross@email.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 'EMPLOYEE', 4),
+  (5, 'best@customerreps.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 'EMPLOYEE', 5),
+  (6, 'skynyrd03@freebird.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 'MANAGER', 6);
 
 INSERT INTO
-  employees
+  customers (id, account_id, creation_date, rating)
 VALUES
-  (6, 123654132, true, '2014-05-08', 150.00);
-
--- Future-dated flight data for reservations/bids testing.
-INSERT INTO
-  flights
-VALUES
-  ('JB', 909, 120, 1111111, NULL, NULL);
+  (1, 1, '2011-04-01 16:00:00', NULL),
+  (2, 2, '2011-01-04 07:00:00', NULL),
+  (3, 3, '2011-01-01 00:00:00', NULL);
 
 INSERT INTO
-  fares
+  employees (id, account_id, ssn, start_date, hourly_rate)
 VALUES
-  ('JB', 909, 0, 'First', 200.00),
-  ('JB', 909, 1, 'First', 350.00),
-  ('JB', 909, 2, 'First', 180.00),
-  ('JB', 909, 0, 'Business', 150.00),
-  ('JB', 909, 1, 'Business', 275.00),
-  ('JB', 909, 2, 'Business', 130.00),
-  ('JB', 909, 0, 'Economy', 95.00),
-  ('JB', 909, 1, 'Economy', 175.00),
-  ('JB', 909, 2, 'Economy', 85.00);
+  (1, 4, 123456789, '1970-01-01', 50.00),
+  (2, 5, 111111111, '1970-01-01', 1.00),
+  (3, 6, 123654132, '2014-05-08', 150.00);
 
 INSERT INTO
-  stops_at
+  flights (id, airline_id, flight_number, number_of_seats, days_operating, min_length_stay, max_length_stay,
+           origin_airport_id, destination_airport_id)
 VALUES
-  (
-    'JB',
-    909,
-    1,
-    'SFI',
-    '2030-06-01 08:00:00',
-    '2030-06-01 10:00:00',
-    0,
-    0
-  ),
-  (
-    'JB',
-    909,
-    2,
-    'LIA',
-    '2030-06-01 16:00:00',
-    '2030-06-01 18:00:00',
-    0,
-    0
-  ),
-  (
-    'JB',
-    909,
-    3,
-    'LHA',
-    '2030-06-02 02:00:00',
-    '2030-06-02 05:00:00',
-    0,
-    0
-  );
+  (1, 'AA', 111, 100, 1010100, NULL, NULL, 'LGA', 'TIA'),
+  (2, 'JB', 111, 150, 1111111, NULL, NULL, 'SFI', 'LHA'),
+  (3, 'AM', 1337, 33, 0000011, NULL, NULL, 'JFK', 'IIA'),
+  (4, 'JB', 777, 150, 1111111, NULL, NULL, 'SFI', 'LHA'),
+  (5, 'JB', 909, 120, 1111111, NULL, NULL, 'SFI', 'LHA');
+
+-- 0 = One way
+-- 1 = Round trip
+-- 2 = Hidden fare (for reverse auctions)
+INSERT INTO
+  fares (flight_id, fare_type, class, fare)
+VALUES
+  (1, 0, 'First', 100.00),
+  (1, 1, 'First', 190.00),
+  (1, 2, 'First', 80.00),
+  (1, 0, 'Business', 50.00),
+  (1, 1, 'Business', 80.00),
+  (1, 2, 'Business', 30.00),
+  (1, 0, 'Economy', 30.00),
+  (1, 1, 'Economy', 60.00),
+  (1, 2, 'Economy', 10.00),
+  (2, 0, 'First', 150.00),
+  (2, 1, 'First', 250.00),
+  (2, 2, 'First', 140.00),
+  (2, 0, 'Business', 100.00),
+  (2, 1, 'Business', 170.00),
+  (2, 2, 'Business', 90.00),
+  (2, 0, 'Economy', 80.00),
+  (2, 1, 'Economy', 150.00),
+  (2, 2, 'Economy', 70.00),
+  (3, 0, 'First', 100.00),
+  (3, 1, 'First', 150.00),
+  (3, 2, 'First', 95.00),
+  (3, 0, 'Business', 75.00),
+  (3, 1, 'Business', 150.00),
+  (3, 2, 'Business', 50.00),
+  (3, 0, 'Economy', 55.00),
+  (3, 1, 'Economy', 130.00),
+  (3, 2, 'Economy', 30.00),
+  (4, 0, 'First', 150.00),
+  (4, 1, 'First', 300.00),
+  (4, 2, 'First', 125.00),
+  (4, 0, 'Business', 125.00),
+  (4, 1, 'Business', 200.00),
+  (4, 2, 'Business', 100.00),
+  (4, 0, 'Economy', 105.00),
+  (4, 1, 'Economy', 180.00),
+  (4, 2, 'Economy', 80.00),
+  (5, 0, 'First', 200.00),
+  (5, 1, 'First', 350.00),
+  (5, 2, 'First', 180.00),
+  (5, 0, 'Business', 150.00),
+  (5, 1, 'Business', 275.00),
+  (5, 2, 'Business', 130.00),
+  (5, 0, 'Economy', 95.00),
+  (5, 1, 'Economy', 175.00),
+  (5, 2, 'Economy', 85.00);
+
+INSERT INTO
+  advance_purchase_discounts (airline_id, days, discount_rate)
+VALUES
+  ('JB', 7, 10),
+  ('AA', 14, 15);
+
+INSERT INTO
+  stops_at (flight_id, stop_number, airport_id, arrival_time, departure_time, arrival_delay, departure_delay)
+VALUES
+  (1, 1, 'LGA', '2011-01-05 09:00:00', '2011-01-05 11:00:00', 0, 0),
+  (1, 2, 'LAX', '2011-01-05 17:00:00', '2011-01-05 19:00:00', 0, 0),
+  (1, 3, 'TIA', '2011-01-06 07:30:00', '2011-01-06 10:00:00', 0, 0),
+  (2, 1, 'SFI', '2011-01-10 12:00:00', '2011-01-10 14:00:00', 0, 0),
+  (2, 2, 'LIA', '2011-01-10 19:30:00', '2011-01-10 22:30:00', 0, 0),
+  (2, 3, 'LHA', '2011-01-11 05:00:00', '2011-01-11 08:00:00', 0, 0),
+  (3, 1, 'JFK', '2011-01-13 05:00:00', '2011-01-13 07:00:00', 0, 0),
+  (3, 2, 'IIA', '2011-01-13 23:00:00', '2011-01-14 03:00:00', 0, 0),
+  (4, 1, 'SFI', '2015-01-01 00:00:00', '2015-01-01 02:00:00', 0, 0),
+  (4, 2, 'JFK', '2015-01-01 03:00:00', '2015-01-01 05:00:00', 0, 0),
+  (4, 3, 'LHA', '2015-01-01 07:00:00', '2015-01-01 10:00:00', 0, 0),
+  (5, 1, 'SFI', '2030-06-01 08:00:00', '2030-06-01 10:00:00', 0, 0),
+  (5, 2, 'LIA', '2030-06-01 16:00:00', '2030-06-01 18:00:00', 0, 0),
+  (5, 3, 'LHA', '2030-06-02 02:00:00', '2030-06-02 05:00:00', 0, 0);
+
+INSERT INTO
+  reservations (id, reservation_date, booking_fee, total_fare, employee_id, customer_id)
+VALUES
+  (111, '2011-01-01 06:00:00', 30.00, 1200.00, 1, 1),
+  (222, '2011-01-01 00:00:00', 30.00, 500.00, 1, 2),
+  (333, '2011-01-01 00:00:00', 30.00, 3333.33, 1, 3),
+  (444, '2014-01-01 00:00:00', 30.00, 500.00, 1, 1),
+  (999, '2011-01-01 00:00:00', 30.00, 999999.00, 2, 1),
+  (911, NOW(), 30.00, 77777.00, 2, 3),
+  (977, NOW(), 30.00, 150.00, 2, 3);
+
+INSERT INTO
+  legs (reservation_id, leg_number, flight_id, from_stop_number)
+VALUES
+  (111, 1, 1, 1),
+  (111, 2, 1, 2),
+  (222, 1, 2, 2),
+  (333, 1, 3, 1),
+  (444, 1, 2, 1),
+  (999, 1, 2, 1),
+  (911, 1, 4, 1),
+  (977, 1, 4, 2);
+
+INSERT INTO
+  passengers (id, customer_id, passenger_name)
+VALUES
+  (1, 1, 'John Doe'),
+  (2, 2, 'Jane Smith'),
+  (3, 3, 'Rick Astley'),
+  (4, 1, 'Additional Passenger');
+
+INSERT INTO
+  reservation_passengers (reservation_id, passenger_id, seat_number, class, meal)
+VALUES
+  (111, 1, 1, 'Economy', 'Chips'),
+  (222, 2, 1, 'First', 'Fish and Chips'),
+  (333, 3, 1, 'First', 'Sushi'),
+  (111, 4, 2, 'Economy', 'Chips'),
+  (444, 1, 1, 'Business', 'Chips'),
+  (999, 1, 1, 'Economy', 'Steak'),
+  (911, 3, 1, 'First', 'Chips'),
+  (977, 3, 1, 'Economy', 'Chips');
+
+INSERT INTO
+  auctions (id, customer_id, flight_id, class, date, name_your_own_price, accepted)
+VALUES
+  (1, 1, 1, 'Economy', '2011-01-01', 400.00, true),
+  (2, 2, 1, 'Economy', '2011-01-01', 500.00, true);
 
 SELECT
   setval(
@@ -626,17 +303,6 @@ SELECT
         MAX(id)
       FROM
         persons
-    )
-  );
-
-SELECT
-  setval(
-    pg_get_serial_sequence('customers', 'account_number'),
-    (
-      SELECT
-        MAX(account_number)
-      FROM
-        customers
     )
   );
 
@@ -653,6 +319,94 @@ SELECT
 
 SELECT
   setval(
+    pg_get_serial_sequence('customers', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        customers
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('employees', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        employees
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('flights', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        flights
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('stops_at', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        stops_at
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('fares', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        fares
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('advance_purchase_discounts', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        advance_purchase_discounts
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('reservations', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        reservations
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('legs', 'id'),
+    (
+      SELECT
+        MAX(id)
+      FROM
+        legs
+    )
+  );
+
+SELECT
+  setval(
     pg_get_serial_sequence('passengers', 'id'),
     (
       SELECT
@@ -664,25 +418,22 @@ SELECT
 
 SELECT
   setval(
-    pg_get_serial_sequence('reservations', 'reservation_number'),
+    pg_get_serial_sequence('reservation_passengers', 'id'),
     (
       SELECT
-        MAX(reservation_number)
+        MAX(id)
       FROM
-        reservations
+        reservation_passengers
     )
   );
 
 SELECT
   setval(
     pg_get_serial_sequence('auctions', 'id'),
-    COALESCE(
-      (
-        SELECT
-          MAX(id)
-        FROM
-          auctions
-      ),
-      0
+    (
+      SELECT
+        MAX(id)
+      FROM
+        auctions
     )
   );

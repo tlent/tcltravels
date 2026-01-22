@@ -46,7 +46,7 @@ public class AdminFlightsService {
   }
 
   public List<FlightSummaryView> getAllFlights() {
-    return flightRepository.findAllByOrderByIdAirlineIdAscIdFlightNumberAsc()
+    return flightRepository.findAllByOrderByAirline_IdAscFlightNumberAsc()
         .stream()
         .map(this::buildSummary)
         .collect(Collectors.toList());
@@ -54,7 +54,7 @@ public class AdminFlightsService {
 
   public List<FlightStopView> getFlightStops(String airlineId, Integer flightNumber) {
     List<StopsAt> stops = stopsAtRepository
-        .findByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumber(airlineId, flightNumber);
+        .findByFlightAirline_IdAndFlightFlightNumberOrderByStopNumber(airlineId, flightNumber);
     return stops.stream().map(this::toStopView).collect(Collectors.toList());
   }
 
@@ -72,49 +72,28 @@ public class AdminFlightsService {
   }
 
   public List<FlightSummaryView> getFlightsForAirport(String airportId) {
-    return flightRepository.findByAirportId(airportId)
+    return flightRepository.findDistinctByStopsAt_Airport_IdOrderByAirline_IdAscFlightNumberAsc(airportId)
         .stream()
         .map(this::buildSummary)
         .collect(Collectors.toList());
   }
 
   private FlightSummaryView buildSummary(Flight flight) {
-    String airlineId = flight.getId().getAirlineId();
-    Integer flightNumber = flight.getId().getFlightNumber();
+    String airlineId = flight.getAirline().getId();
+    Integer flightNumber = flight.getFlightNumber();
     String airlineName = flight.getAirline() != null ? flight.getAirline().getName() : "";
 
-    List<StopsAt> stops = stopsAtRepository
-        .findByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumber(airlineId, flightNumber);
-    return buildSummaryWithStops(airlineId, airlineName, flightNumber, flight.getNumberOfSeats(),
-        flight.getDaysOperating(), stops);
-  }
-
-  private FlightSummaryView buildSummaryWithStops(String airlineId, String airlineName, Integer flightNumber,
-      Integer numberOfSeats, String daysOperating) {
-    List<StopsAt> stops = stopsAtRepository
-        .findByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumber(airlineId, flightNumber);
-    return buildSummaryWithStops(airlineId, airlineName, flightNumber, numberOfSeats, daysOperating, stops);
-  }
-
-  private FlightSummaryView buildSummaryWithStops(String airlineId, String airlineName, Integer flightNumber,
-      Integer numberOfSeats, String daysOperating, List<StopsAt> stops) {
-    StopsAt origin = stops.isEmpty() ? null : stops.get(0);
-    StopsAt destination = stops.isEmpty() ? null : stops.get(stops.size() - 1);
-
-    String originId = origin != null && origin.getAirport() != null ? origin.getAirport().getId() : "";
-    String originCity = origin != null && origin.getAirport() != null ? origin.getAirport().getCity() : "";
-    String destinationId = destination != null && destination.getAirport() != null ? destination.getAirport().getId()
-        : "";
-    String destinationCity = destination != null && destination.getAirport() != null
-        ? destination.getAirport().getCity()
-        : "";
+    String originId = flight.getOriginAirport() != null ? flight.getOriginAirport().getId() : "";
+    String originCity = flight.getOriginAirport() != null ? flight.getOriginAirport().getCity() : "";
+    String destinationId = flight.getDestinationAirport() != null ? flight.getDestinationAirport().getId() : "";
+    String destinationCity = flight.getDestinationAirport() != null ? flight.getDestinationAirport().getCity() : "";
 
     return new FlightSummaryView(
         airlineId,
         airlineName,
         flightNumber,
-        numberOfSeats,
-        formatDaysOperating(daysOperating),
+        flight.getNumberOfSeats(),
+        formatDaysOperating(flight.getDaysOperating()),
         originId,
         originCity,
         destinationId,
@@ -124,7 +103,7 @@ public class AdminFlightsService {
   private FlightActivityView buildActivityWithStops(String airlineId, String airlineName, Integer flightNumber,
       Integer numberOfSeats, String daysOperating, Long reservationCount) {
     List<StopsAt> stops = stopsAtRepository
-        .findByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumber(airlineId, flightNumber);
+        .findByFlightAirline_IdAndFlightFlightNumberOrderByStopNumber(airlineId, flightNumber);
     StopsAt origin = stops.isEmpty() ? null : stops.get(0);
     StopsAt destination = stops.isEmpty() ? null : stops.get(stops.size() - 1);
 
@@ -154,9 +133,9 @@ public class AdminFlightsService {
     String airportName = stop.getAirport() != null ? stop.getAirport().getName() : "";
     String city = stop.getAirport() != null ? stop.getAirport().getCity() : "";
     return new FlightStopView(
-        stop.getId().getFlightId().getAirlineId(),
-        stop.getId().getFlightId().getFlightNumber(),
-        stop.getId().getStopNumber(),
+        stop.getFlight().getAirline().getId(),
+        stop.getFlight().getFlightNumber(),
+        stop.getStopNumber(),
         airportId,
         airportName,
         city,

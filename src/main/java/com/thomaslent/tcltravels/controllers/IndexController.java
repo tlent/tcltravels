@@ -29,10 +29,10 @@ public class IndexController {
   @GetMapping("/")
   @PreAuthorize("hasRole('CUSTOMER')")
   public String index(Model model, @AuthenticationPrincipal UserPrincipal principal) {
-    Long accountNumber = principal.getAccountNumber();
+    Long customerId = principal.getCustomerId();
     model.addAttribute("filter", flightFilterService.getFilterResult(null, null, null, null));
-    model.addAttribute("recommended_flights", flightsService.getRecommendedFlights(accountNumber));
-    model.addAttribute("current_reservations", reservationsService.getCurrentReservations(accountNumber));
+    model.addAttribute("recommended_flights", flightsService.getRecommendedFlights(customerId));
+    model.addAttribute("current_reservations", reservationsService.getCurrentReservations(customerId));
     return "index";
   }
 

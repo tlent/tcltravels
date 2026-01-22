@@ -49,15 +49,17 @@ public class FlightFilterService {
 
     List<StopsAt> stops;
     if (beforeLocal == null) {
-      stops = stopsAtRepository.findMatchingStopsNoBefore(airlineFilter, airportFilter, afterOffset);
+      stops = stopsAtRepository.findByFlightAirline_IdAndAirport_IdAndDepartureTimeGreaterThanEqual(
+          airlineFilter, airportFilter, afterOffset);
     } else {
       OffsetDateTime beforeOffset = beforeLocal.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toOffsetDateTime();
-      stops = stopsAtRepository.findMatchingStopsWithBefore(airlineFilter, airportFilter, afterOffset, beforeOffset);
+      stops = stopsAtRepository.findByFlightAirline_IdAndAirport_IdAndDepartureTimeBetween(
+          airlineFilter, airportFilter, afterOffset, beforeOffset);
     }
 
     List<StopView> stopViews = stops.stream().map(stop -> new StopView(
-        stop.getId().getFlightId().getAirlineId(), stop.getAirport().getId(),
-        stop.getId().getFlightId().getFlightNumber(), stop.getId().getStopNumber(), stop.getArrivalTime(),
+        stop.getFlight().getAirline().getId(), stop.getAirport().getId(),
+        stop.getFlight().getFlightNumber(), stop.getStopNumber(), stop.getArrivalTime(),
         stop.getDepartureTime(), stop.getDepartureTime().toLocalDate())).collect(Collectors.toList());
 
     return new FlightFilterResult(

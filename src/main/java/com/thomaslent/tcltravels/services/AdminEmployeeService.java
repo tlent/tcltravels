@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.thomaslent.tcltravels.dto.AdminEmployeeView;
 import com.thomaslent.tcltravels.dto.EmployeeCreateForm;
@@ -39,22 +39,19 @@ public class AdminEmployeeService {
   }
 
   public List<AdminEmployeeView> getEmployees() {
-    return employeeRepository.findAllByOrderByPersonLastNameAscPersonFirstNameAsc()
+    return employeeRepository.findAllByOrderByAccountPersonLastNameAscAccountPersonFirstNameAsc()
         .stream()
         .map(this::toAdminEmployeeView)
         .collect(Collectors.toList());
   }
 
   public EmployeeEditForm getEmployeeEditForm(Long personId) {
-    Person person = personRepository.findById(personId).orElse(null);
-    if (person == null) {
-      return null;
-    }
-    Optional<Employee> employeeOpt = employeeRepository.findByPerson(person);
+    Optional<Employee> employeeOpt = employeeRepository.findByAccountPersonId(personId);
     if (employeeOpt.isEmpty()) {
       return null;
     }
     Employee employee = employeeOpt.get();
+    Person person = employee.getAccount().getPerson();
     EmployeeEditForm form = new EmployeeEditForm();
     form.setFirstName(person.getFirstName());
     form.setLastName(person.getLastName());
@@ -66,7 +63,7 @@ public class AdminEmployeeService {
     form.setSsn(employee.getSsn() != null ? employee.getSsn().toString() : "");
     form.setStartDate(employee.getStartDate() != null ? employee.getStartDate().format(DATE_FORMATTER) : "");
     form.setHourlyRate(employee.getHourlyRate() != null ? employee.getHourlyRate().toString() : "");
-    form.setIsManager(Boolean.TRUE.equals(employee.getIsManager()));
+    form.setIsManager("MANAGER".equals(employee.getAccount().getRole()));
     return form;
   }
 
@@ -85,13 +82,13 @@ public class AdminEmployeeService {
     User user = new User();
     user.setUsername(form.getEmail());
     user.setPassword(passwordEncoder.encode(form.getPassword()));
+    user.setRole(form.getIsManager() ? "MANAGER" : "EMPLOYEE");
     user.setPerson(person);
     userRepository.save(user);
 
     Employee employee = new Employee();
-    employee.setPerson(person);
+    employee.setAccount(user);
     employee.setSsn(Integer.parseInt(form.getSsn()));
-    employee.setIsManager(form.getIsManager());
     employee.setStartDate(LocalDate.parse(form.getStartDate(), DATE_FORMATTER));
     employee.setHourlyRate(new BigDecimal(form.getHourlyRate()));
     employeeRepository.save(employee);
@@ -99,14 +96,12 @@ public class AdminEmployeeService {
 
   @Transactional
   public boolean updateEmployee(Long personId, EmployeeEditForm form) {
-    Person person = personRepository.findById(personId).orElse(null);
-    if (person == null) {
-      return false;
-    }
-    Optional<Employee> employeeOpt = employeeRepository.findByPerson(person);
+    Optional<Employee> employeeOpt = employeeRepository.findByAccountPersonId(personId);
     if (employeeOpt.isEmpty()) {
       return false;
     }
+    Employee employee = employeeOpt.get();
+    Person person = employee.getAccount().getPerson();
     person.setFirstName(form.getFirstName());
     person.setLastName(form.getLastName());
     person.setAddress(form.getAddress());
@@ -116,10 +111,14 @@ public class AdminEmployeeService {
     person.setZipCode(Integer.parseInt(form.getZipcode()));
     personRepository.save(person);
 
-    Integer newSsn = Integer.parseInt(form.getSsn());
-    LocalDate startDate = LocalDate.parse(form.getStartDate(), DATE_FORMATTER);
-    BigDecimal hourlyRate = new BigDecimal(form.getHourlyRate());
-    employeeRepository.updateEmployeeByPersonId(personId, newSsn, form.getIsManager(), startDate, hourlyRate);
+    employee.setSsn(Integer.parseInt(form.getSsn()));
+    employee.setStartDate(LocalDate.parse(form.getStartDate(), DATE_FORMATTER));
+    employee.setHourlyRate(new BigDecimal(form.getHourlyRate()));
+    employeeRepository.save(employee);
+
+    User user = employee.getAccount();
+    user.setRole(form.getIsManager() ? "MANAGER" : "EMPLOYEE");
+    userRepository.save(user);
     return true;
   }
 
@@ -138,14 +137,14 @@ public class AdminEmployeeService {
   }
 
   private AdminEmployeeView toAdminEmployeeView(Employee employee) {
-    Person person = employee.getPerson();
+    Person person = employee.getAccount().getPerson();
     return new AdminEmployeeView(
         person.getId(),
         person.getFirstName(),
         person.getLastName(),
         person.getTelephone(),
         employee.getSsn(),
-        employee.getIsManager(),
+        "MANAGER".equals(employee.getAccount().getRole()),
         employee.getHourlyRate());
   }
 }

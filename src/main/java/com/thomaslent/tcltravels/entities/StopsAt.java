@@ -3,8 +3,10 @@ package com.thomaslent.tcltravels.entities;
 import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -12,8 +14,16 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "stops_at")
 public class StopsAt {
-  @EmbeddedId
-  private StopsAtId id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @ManyToOne
+  @JoinColumn(name = "flight_id", referencedColumnName = "id")
+  private Flight flight;
+
+  @Column(name = "stop_number")
+  private Integer stopNumber;
 
   @ManyToOne
   @JoinColumn(name = "airport_id", referencedColumnName = "id")
@@ -31,12 +41,28 @@ public class StopsAt {
   @Column(name = "departure_delay")
   private Integer departureDelay;
 
-  public StopsAtId getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(StopsAtId id) {
+  public void setId(Long id) {
     this.id = id;
+  }
+
+  public Flight getFlight() {
+    return flight;
+  }
+
+  public void setFlight(Flight flight) {
+    this.flight = flight;
+  }
+
+  public Integer getStopNumber() {
+    return stopNumber;
+  }
+
+  public void setStopNumber(Integer stopNumber) {
+    this.stopNumber = stopNumber;
   }
 
   public Airport getAirport() {
@@ -78,5 +104,4 @@ public class StopsAt {
   public void setDepartureDelay(Integer departureDelay) {
     this.departureDelay = departureDelay;
   }
-
 }

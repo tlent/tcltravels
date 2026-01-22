@@ -10,35 +10,34 @@ import org.springframework.data.repository.query.Param;
 import com.thomaslent.tcltravels.dto.FlightActivityRow;
 import com.thomaslent.tcltravels.dto.ReservationLegRow;
 import com.thomaslent.tcltravels.entities.Leg;
-import com.thomaslent.tcltravels.entities.LegId;
 
-public interface LegRepository extends JpaRepository<Leg, LegId> {
-  Leg findFirstByReservationReservationNumberOrderByIdLegNumberAsc(Long reservationNumber);
+public interface LegRepository extends JpaRepository<Leg, Long> {
+  Leg findFirstByReservationIdOrderByLegNumberAsc(Long reservationId);
 
-  List<Leg> findByReservationReservationNumberInAndIdLegNumber(
-      List<Long> reservationNumbers, Integer legNumber);
+  List<Leg> findByReservationIdInAndLegNumber(
+      List<Long> reservationIds, Integer legNumber);
 
   @Query("""
       select new com.thomaslent.tcltravels.dto.FlightActivityRow(
-        f.id.airlineId,
+        f.airline.id,
         f.airline.name,
-        f.id.flightNumber,
+        f.flightNumber,
         f.numberOfSeats,
         f.daysOperating,
-        count(distinct l.reservation.reservationNumber)
+        count(distinct l.reservation.id)
       )
       from Leg l
       join l.flight f
-      group by f.id.airlineId, f.airline.name, f.id.flightNumber, f.numberOfSeats, f.daysOperating
-      order by count(distinct l.reservation.reservationNumber) desc
+      group by f.airline.id, f.airline.name, f.flightNumber, f.numberOfSeats, f.daysOperating
+      order by count(distinct l.reservation.id) desc
       """)
   List<FlightActivityRow> findMostActiveFlights(Pageable pageable);
 
   @Query(value = """
         SELECT
-          l.reservation_number AS reservationNumber,
-          l.airline_id AS airlineId,
-          l.flight_number AS flightNumber,
+          l.reservation_id AS reservationNumber,
+          f.airline_id AS airlineId,
+          f.flight_number AS flightNumber,
           os.airport_id AS originAirportId,
           o.name AS originName,
           o.city AS originCity,
@@ -48,18 +47,17 @@ public interface LegRepository extends JpaRepository<Leg, LegId> {
           os.departure_time AS departureTime,
           ds.arrival_time AS arrivalTime
         FROM legs l
+        JOIN flights f ON f.id = l.flight_id
         JOIN stops_at os
-          ON os.airline_id = l.airline_id
-          AND os.flight_number = l.flight_number
+          ON os.flight_id = l.flight_id
           AND os.stop_number = l.from_stop_number
         JOIN airports o ON o.id = os.airport_id
         JOIN stops_at ds
-          ON ds.airline_id = l.airline_id
-          AND ds.flight_number = l.flight_number
+          ON ds.flight_id = l.flight_id
           AND ds.stop_number = l.from_stop_number + 1
         JOIN airports d ON d.id = ds.airport_id
-        WHERE l.reservation_number IN :reservationNumbers
-        ORDER BY l.reservation_number, l.leg_number
+        WHERE l.reservation_id IN :reservationIds
+        ORDER BY l.reservation_id, l.leg_number
       """, nativeQuery = true)
-  public List<ReservationLegRow> getReservationLegs(@Param("reservationNumbers") List<Long> reservationNumbers);
+  public List<ReservationLegRow> getReservationLegs(@Param("reservationIds") List<Long> reservationIds);
 }

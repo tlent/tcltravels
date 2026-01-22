@@ -71,21 +71,21 @@ public class AdminReportingService {
   }
 
   public List<FlightOptionView> getFlightOptions() {
-    return flightRepository.findAllByOrderByIdAirlineIdAscIdFlightNumberAsc()
+    return flightRepository.findAllByOrderByAirline_IdAscFlightNumberAsc()
         .stream()
         .map(this::toFlightOption)
         .collect(Collectors.toList());
   }
 
   public List<CustomerOptionView> getCustomerOptions() {
-    return customerRepository.findAllByOrderByPersonLastNameAscPersonFirstNameAsc()
+    return customerRepository.findAllByOrderByAccountPersonLastNameAscAccountPersonFirstNameAsc()
         .stream()
         .map(this::toCustomerOption)
         .collect(Collectors.toList());
   }
 
   public List<String> getCityOptions() {
-    return airportRepository.findDistinctCities();
+    return airportRepository.findDistinctCityByOrderByCityAsc();
   }
 
   public List<SalesReservationView> getSalesByFlight(String airlineId, Integer flightNumber) {
@@ -100,27 +100,27 @@ public class AdminReportingService {
     return total == null ? BigDecimal.ZERO : total;
   }
 
-  public List<SalesCustomerReservationView> getSalesByCustomer(Long accountNumber) {
+  public List<SalesCustomerReservationView> getSalesByCustomer(Long customerId) {
     List<Reservation> reservations =
-        reservationRepository.findByCustomerAccountNumberOrderByTotalFareDesc(accountNumber);
+        reservationRepository.findByCustomerIdOrderByTotalFareDesc(customerId);
     if (reservations.isEmpty()) {
       return List.of();
     }
     List<Long> reservationNumbers = reservations.stream()
-        .map(Reservation::getReservationNumber)
+        .map(Reservation::getId)
         .collect(Collectors.toList());
     Map<Long, Leg> firstLegs = legRepository
-        .findByReservationReservationNumberInAndIdLegNumber(reservationNumbers, 1)
+        .findByReservationIdInAndLegNumber(reservationNumbers, 1)
         .stream()
-        .collect(Collectors.toMap(l -> l.getReservation().getReservationNumber(), l -> l));
+        .collect(Collectors.toMap(l -> l.getReservation().getId(), l -> l));
 
     return reservations.stream()
-        .map(reservation -> toCustomerReservationView(reservation, firstLegs.get(reservation.getReservationNumber())))
+        .map(reservation -> toCustomerReservationView(reservation, firstLegs.get(reservation.getId())))
         .collect(Collectors.toList());
   }
 
-  public BigDecimal getSalesTotalByCustomer(Long accountNumber) {
-    BigDecimal total = reservationRepository.sumTotalFareByCustomerAccountNumber(accountNumber);
+  public BigDecimal getSalesTotalByCustomer(Long customerId) {
+    BigDecimal total = reservationRepository.sumTotalFareByCustomerId(customerId);
     return total == null ? BigDecimal.ZERO : total;
   }
 
@@ -130,12 +130,14 @@ public class AdminReportingService {
 
   private SalesReservationView toSalesReservationView(Reservation reservation) {
     String customerName = "";
-    if (reservation.getCustomer() != null && reservation.getCustomer().getPerson() != null) {
-      customerName = reservation.getCustomer().getPerson().getFirstName() + " "
-          + reservation.getCustomer().getPerson().getLastName();
+    if (reservation.getCustomer() != null
+        && reservation.getCustomer().getAccount() != null
+        && reservation.getCustomer().getAccount().getPerson() != null) {
+      customerName = reservation.getCustomer().getAccount().getPerson().getFirstName() + " "
+          + reservation.getCustomer().getAccount().getPerson().getLastName();
     }
     return new SalesReservationView(
-        reservation.getReservationNumber(),
+        reservation.getId(),
         customerName,
         reservation.getReservationDate(),
         reservation.getBookingFee(),
@@ -145,12 +147,12 @@ public class AdminReportingService {
   private SalesCustomerReservationView toCustomerReservationView(Reservation reservation, Leg firstLeg) {
     String airlineId = null;
     Integer flightNumber = null;
-    if (firstLeg != null && firstLeg.getFlight() != null && firstLeg.getFlight().getId() != null) {
-      airlineId = firstLeg.getFlight().getId().getAirlineId();
-      flightNumber = firstLeg.getFlight().getId().getFlightNumber();
+    if (firstLeg != null && firstLeg.getFlight() != null && firstLeg.getFlight().getAirline() != null) {
+      airlineId = firstLeg.getFlight().getAirline().getId();
+      flightNumber = firstLeg.getFlight().getFlightNumber();
     }
     return new SalesCustomerReservationView(
-        reservation.getReservationNumber(),
+        reservation.getId(),
         airlineId,
         flightNumber,
         reservation.getReservationDate(),
@@ -159,13 +161,17 @@ public class AdminReportingService {
   }
 
   private FlightOptionView toFlightOption(Flight flight) {
-    return new FlightOptionView(flight.getId().getAirlineId(), flight.getId().getFlightNumber());
+    return new FlightOptionView(flight.getAirline().getId(), flight.getFlightNumber());
   }
 
   private CustomerOptionView toCustomerOption(Customer customer) {
-    String firstName = customer.getPerson() != null ? customer.getPerson().getFirstName() : "";
-    String lastName = customer.getPerson() != null ? customer.getPerson().getLastName() : "";
-    return new CustomerOptionView(customer.getAccountNumber(), firstName, lastName);
+    String firstName = customer.getAccount() != null && customer.getAccount().getPerson() != null
+        ? customer.getAccount().getPerson().getFirstName()
+        : "";
+    String lastName = customer.getAccount() != null && customer.getAccount().getPerson() != null
+        ? customer.getAccount().getPerson().getLastName()
+        : "";
+    return new CustomerOptionView(customer.getId(), firstName, lastName);
   }
 
   private OffsetDateTime monthStart(int month, int year) {

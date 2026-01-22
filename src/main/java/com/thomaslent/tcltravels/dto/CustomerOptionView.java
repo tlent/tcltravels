@@ -1,7 +1,7 @@
 package com.thomaslent.tcltravels.dto;
 
 public record CustomerOptionView(
-    Long accountNumber,
+    Long customerId,
     String firstName,
     String lastName) {
 }

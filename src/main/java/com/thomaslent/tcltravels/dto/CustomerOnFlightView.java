@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 public record CustomerOnFlightView(
     Long reservationNumber,
-    Long accountNumber,
+    Long customerId,
     String passengerName,
     String seatClass,
     Long passengerCount,

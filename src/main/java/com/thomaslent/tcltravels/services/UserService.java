@@ -60,12 +60,12 @@ public class UserService {
     User user = new User();
     user.setUsername(dto.getEmail());
     user.setPassword(passwordEncoder.encode(dto.getPassword()));
+    user.setRole("CUSTOMER");
     user.setPerson(person);
     userRepository.save(user);
 
     Customer customer = new Customer();
-    customer.setEmail(dto.getEmail());
-    customer.setPerson(person);
+    customer.setAccount(user);
     customerRepository.save(customer);
   }
 

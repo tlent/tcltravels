@@ -2,7 +2,6 @@ package com.thomaslent.tcltravels.entities;
 
 import java.time.OffsetDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,40 +17,36 @@ import jakarta.persistence.Table;
 public class Customer {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "account_number")
-  private Long accountNumber;
+  private Long id;
 
-  @Column(nullable = false)
-  private String email;
+  @OneToOne
+  @JoinColumn(name = "account_id", referencedColumnName = "id")
+  private User account;
 
   @Column(name = "creation_date")
   private OffsetDateTime creationDate;
 
   private Integer rating;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "id", referencedColumnName = "id")
-  private Person person;
-
   @PrePersist
   protected void onCreate() {
     this.creationDate = OffsetDateTime.now();
   }
 
-  public Long getAccountNumber() {
-    return accountNumber;
+  public Long getId() {
+    return id;
   }
 
-  public void setAccountNumber(Long accountNumber) {
-    this.accountNumber = accountNumber;
+  public void setId(Long id) {
+    this.id = id;
   }
 
-  public String getEmail() {
-    return email;
+  public User getAccount() {
+    return account;
   }
 
-  public void setEmail(String email) {
-    this.email = email;
+  public void setAccount(User account) {
+    this.account = account;
   }
 
   public OffsetDateTime getCreationDate() {
@@ -68,14 +63,6 @@ public class Customer {
 
   public void setRating(Integer rating) {
     this.rating = rating;
-  }
-
-  public Person getPerson() {
-    return person;
-  }
-
-  public void setPerson(Person person) {
-    this.person = person;
   }
 
 }

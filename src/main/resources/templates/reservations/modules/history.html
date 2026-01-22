@@ -17,7 +17,7 @@
     <tbody th:each="r : ${past_reservations}">
       <tr>
         <td th:text="${r.reservationNumber}"></td>
-        <td th:text="${r.accountNumber}"></td>
+        <td th:text="${r.customerId}"></td>
         <td
           th:text="${#temporals.format(r.reservationDate, 'MMMM d, yyyy | hh:mm a')}"
         ></td>

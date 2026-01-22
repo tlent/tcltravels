@@ -7,6 +7,7 @@ import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "legs")
@@ -33,6 +34,9 @@ public class Leg {
       @JoinColumn(name = "from_stop_number", referencedColumnName = "stop_number", insertable = false, updatable = false)
   })
   private StopsAt fromStop;
+
+  @Column(name = "from_stop_number")
+  private Integer fromStopNumber;
 
   public LegId getId() {
     return id;
@@ -64,5 +68,13 @@ public class Leg {
 
   public void setFromStop(StopsAt fromStop) {
     this.fromStop = fromStop;
+  }
+
+  public Integer getFromStopNumber() {
+    return fromStopNumber;
+  }
+
+  public void setFromStopNumber(Integer fromStopNumber) {
+    this.fromStopNumber = fromStopNumber;
   }
 }

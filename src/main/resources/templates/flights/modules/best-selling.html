@@ -26,15 +26,23 @@
       <td th:text="|${b.originId} (${b.originCity})|"></td>
       <td th:text="|${b.destinationId} (${b.destinationCity})|"></td>
       <td>
-        <form th:action="@{/reservations/processReservation}" method="post">
-          <input type="hidden" name="flightNumber" th:value="${b.flightNumber}" />
+        <form th:action="@{/reservations/new}" method="get">
+          <input
+            type="hidden"
+            name="flightNumber"
+            th:value="${b.flightNumber}"
+          />
           <input type="hidden" name="airlineId" th:value="${b.airlineId}" />
           <input type="submit" value="Reserve" />
         </form>
       </td>
       <td>
-        <form th:action="@{/flights/placeBid}" method="post">
-          <input type="hidden" name="flightNumber" th:value="${b.flightNumber}" />
+        <form th:action="@{/reservations/bid}" method="get">
+          <input
+            type="hidden"
+            name="flightNumber"
+            th:value="${b.flightNumber}"
+          />
           <input type="hidden" name="airlineId" th:value="${b.airlineId}" />
           <input type="submit" value="Bid" />
         </form>

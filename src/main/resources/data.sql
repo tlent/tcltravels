@@ -568,6 +568,59 @@ INSERT INTO
 VALUES
   (6, 123654132, true, '2014-05-08', 150.00);
 
+-- Future-dated flight data for reservations/bids testing.
+INSERT INTO
+  flights
+VALUES
+  ('JB', 909, 120, 1111111, NULL, NULL);
+
+INSERT INTO
+  fares
+VALUES
+  ('JB', 909, 0, 'First', 200.00),
+  ('JB', 909, 1, 'First', 350.00),
+  ('JB', 909, 2, 'First', 180.00),
+  ('JB', 909, 0, 'Business', 150.00),
+  ('JB', 909, 1, 'Business', 275.00),
+  ('JB', 909, 2, 'Business', 130.00),
+  ('JB', 909, 0, 'Economy', 95.00),
+  ('JB', 909, 1, 'Economy', 175.00),
+  ('JB', 909, 2, 'Economy', 85.00);
+
+INSERT INTO
+  stops_at
+VALUES
+  (
+    'JB',
+    909,
+    1,
+    'SFI',
+    '2030-06-01 08:00:00',
+    '2030-06-01 10:00:00',
+    0,
+    0
+  ),
+  (
+    'JB',
+    909,
+    2,
+    'LIA',
+    '2030-06-01 16:00:00',
+    '2030-06-01 18:00:00',
+    0,
+    0
+  ),
+  (
+    'JB',
+    909,
+    3,
+    'LHA',
+    '2030-06-02 02:00:00',
+    '2030-06-02 05:00:00',
+    0,
+    0
+  );
+
 SELECT
   setval(
     pg_get_serial_sequence('persons', 'id'),
@@ -620,5 +673,19 @@ SELECT
         MAX(reservation_number)
       FROM
         reservations
+    )
+  );
+
+SELECT
+  setval(
+    pg_get_serial_sequence('auctions', 'id'),
+    COALESCE(
+      (
+        SELECT
+          MAX(id)
+        FROM
+          auctions
+      ),
+      0
     )
   );

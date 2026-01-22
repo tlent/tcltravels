@@ -11,6 +11,19 @@ import com.thomaslent.tcltravels.entities.StopsAt;
 import com.thomaslent.tcltravels.entities.StopsAtId;
 
 public interface StopsAtRepository extends JpaRepository<StopsAt, StopsAtId> {
+    List<StopsAt> findByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumber(
+            String airlineId, Integer flightNumber);
+
+    StopsAt findFirstByIdFlightIdAirlineIdAndIdFlightIdFlightNumberAndIdStopNumberOrderByDepartureTimeAsc(
+            String airlineId, Integer flightNumber, Integer stopNumber);
+
+    StopsAt findTopByIdFlightIdAirlineIdAndIdFlightIdFlightNumberOrderByIdStopNumberDesc(
+            String airlineId, Integer flightNumber);
+
+    boolean existsByIdFlightIdAirlineIdAndIdFlightIdFlightNumberAndIdStopNumberAndDepartureTimeBetween(
+            String airlineId, Integer flightNumber, Integer stopNumber,
+            OffsetDateTime start, OffsetDateTime end);
+
     @Query("""
             select s from StopsAt s
             where s.id.flightId.airlineId = :airlineId

@@ -1,0 +1,57 @@
+<div
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Place Bid')}"
+>
+  <main>
+    <div th:object="${bidForm}">
+      <h2 class="error redtext" th:if="${#fields.hasErrors('*')}">
+        <span th:each="err : ${#fields.errors('*')}" th:text="${err}"></span>
+      </h2>
+
+      <div class="bigtext align_right" style="color: #aaa; margin-bottom: -18px">
+        Enter your information and bid value
+      </div>
+
+      <div class="table_header" th:text="|Bid on Flight [${bidForm.airlineId}] ${bidForm.flightNumber}|"></div>
+
+      <form th:action="@{/reservations/bid}" method="post">
+        <input type="hidden" th:field="*{airlineId}">
+        <input type="hidden" th:field="*{flightNumber}">
+        <table id="bid_table" class="wide_table">
+          <tr>
+            <th></th>
+          </tr>
+          <tr>
+            <td class="light_gradient" style="padding: 25px 40px">
+              Departure date:
+              <input type="date" th:field="*{departureDate}"><br><br>
+              Flight class:
+              <input type="radio" th:field="*{flightClass}" value="First">First class
+              <input type="radio" th:field="*{flightClass}" value="Business">Business class
+              <input type="radio" th:field="*{flightClass}" value="Economy">Economy class
+              <br/><br/>
+
+              Food Preferences:
+              <input type="text" th:field="*{food}" style="margin-left: 0.5em">
+              <br/><br/>
+
+              Other Preferences:
+              <input type="text" th:field="*{other}" style="margin-left: 0.2em">
+              <br/><br/>
+
+              <hr><br/>
+              Enter your bid ($):
+              <input type="text" th:field="*{bid}">
+              <br/><br/>
+
+              <input type="submit" value="Place Bid">
+
+              <span class="error redtext mediumtext" style="float: right" th:if="${bidRejected}">
+                Bid rejected. Enter a higher offer.
+              </span>
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </main>
+</div>

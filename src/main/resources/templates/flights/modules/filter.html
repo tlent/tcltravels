@@ -43,7 +43,11 @@
             <tr>
               <td>Departing before:</td>
               <td>
-                <input type="date" name="ff_before" th:value="${filter.before}" />
+                <input
+                  type="date"
+                  name="ff_before"
+                  th:value="${filter.before}"
+                />
               </td>
             </tr>
             <tr>
@@ -87,13 +91,17 @@
               Departure Time
             </td>
             <td>
-              <form th:action="@{/reservations/processReservation}" method="post">
+              <form th:action="@{/reservations/new}" method="get">
                 <input
                   type="hidden"
                   name="flightNumber"
                   th:value="${s.flightNumber}"
                 />
-                <input type="hidden" name="airlineID" th:value="${s.airlineId}" />
+                <input
+                  type="hidden"
+                  name="airlineId"
+                  th:value="${s.airlineId}"
+                />
                 <input
                   type="hidden"
                   name="departureDate"
@@ -103,13 +111,17 @@
               </form>
             </td>
             <td>
-              <form th:action="@{/flights/placeBid}" method="post">
+              <form th:action="@{/reservations/bid}" method="get">
                 <input
                   type="hidden"
                   name="flightNumber"
                   th:value="${s.flightNumber}"
                 />
-                <input type="hidden" name="airlineID" th:value="${s.airlineId}" />
+                <input
+                  type="hidden"
+                  name="airlineId"
+                  th:value="${s.airlineId}"
+                />
                 <input
                   type="hidden"
                   name="departureDate"

@@ -1,0 +1,144 @@
+<div
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reserve Flight')}"
+>
+  <main>
+    <div th:object="${reservationForm}">
+      <h2 class="error redtext" th:if="${#fields.hasErrors('*')}">
+        <span th:each="err : ${#fields.errors('*')}" th:text="${err}"></span>
+      </h2>
+
+      <div class="bigtext align_right" style="color: #aaa; margin-bottom: -18px">
+          Fill in the following information
+      </div>
+
+      <div class="table_header" th:text="|Reserve Flight [${reservationForm.airlineId}] ${reservationForm.flightNumber}|"></div>
+
+      <form id="reservation_form" th:action="@{/reservations}" method="post">
+        <input type="hidden" th:field="*{airlineId}">
+        <input type="hidden" th:field="*{flightNumber}">
+      <table class="wide_table light_gradient">
+          <tr>
+              <th colspan="4"></th>
+          </tr>
+          <tr>
+              <td>Airport of origin</td>
+              <td>Airport of destination</td>
+          </tr>
+          <tr>
+              <td>
+                  <select id="origin" th:field="*{origin}">
+                    <option th:each="s : ${originStops}"
+                            th:value="${s.stopNumber}"
+                            th:text="${s.airportId}">
+                    </option>
+                  </select>
+              </td>
+              <td>
+                  <select id="destination" th:field="*{destination}">
+                    <option th:each="s : ${destinationStops}"
+                            th:value="${s.stopNumber}"
+                            th:text="${s.airportId}">
+                    </option>
+                  </select>
+              </td>
+          </tr>
+          <tr>
+              <td>
+                  Number of Passengers
+              </td>
+              <td>
+                  Other Preferences
+              </td>
+              <td>
+                  Date of Departure
+              </td>
+          </tr>
+          <tr>
+              <td>
+                  <select id="passengerCount" th:field="*{passengerCount}" onchange="hideInputToggle()">
+                      <option value="1">1 Person</option>
+                      <option value="2">2 People</option>
+                      <option value="3">3 People</option>
+                      <option value="4">4 People</option>
+                      <option value="5">5 People</option>
+                  </select>
+              </td>
+              <td>
+                  <input type="text" id="other" th:field="*{other}">
+              </td>
+
+              <td>
+                  <input type="date" th:field="*{departureDate}">
+              </td>
+          </tr>
+
+
+          <th:block th:each="n : ${#numbers.sequence(1, 5)}">
+              <tr th:id="|person${n}_head|"
+                  th:classappend="${n > 1} ? 'person_style' : null">
+                  <td>First Name</td>
+                  <td>Last Name</td>
+                  <td>Class of flight</td>
+                  <td>Food Preferences</td>
+              </tr>
+              <tr th:id="|person${n}|"
+                  th:classappend="${n > 1} ? 'person_style' : null">
+                  <td>
+                      <input type="text" th:name="|first${n}|" th:id="|first${n}|">
+                  </td>
+                  <td>
+                      <input type="text" th:name="|last${n}|" th:id="|last${n}|">
+                  </td>
+                  <td>
+                      <select th:name="|class${n}|" th:id="|class${n}|">
+                          <option value="First">First Class</option>
+                          <option value="Business">Business Class</option>
+                          <option value="Economy">Economy Class</option>
+                      </select>
+                  </td>
+                  <td>
+                      <input type="text" th:name="|food${n}|" th:id="|food${n}|">
+                  </td>
+              </tr>
+          </th:block>
+
+          <tr>
+              <td colspan="4" class="align_middle" style="padding: 20px;">
+                  <input type="submit" value="Reserve Flight">
+              </td>
+          </tr>
+      </table>
+      </form>
+    </div>
+  </main>
+</div>
+<script>
+  const hideInputToggle = () => {
+    const count = Number(document.getElementById("passengerCount").value);
+    for (let i = 1; i <= 5; i++) {
+      const toggleDisplayIds = [`person${i}_head`, `person${i}`];
+      const toggleDisableIds = [
+        `first${i}`,
+        `last${i}`,
+        `class${i}`,
+        `food${i}`,
+      ];
+      if (count >= i) {
+        for (const id of toggleDisplayIds) {
+          document.getElementById(id).style.display = "table-row";
+        }
+        for (const id of toggleDisableIds) {
+          document.getElementById(id).removeAttribute("disabled");
+        }
+      } else {
+        for (const id of toggleDisplayIds) {
+          document.getElementById(id).style.display = "none";
+        }
+        for (const id of toggleDisableIds) {
+          document.getElementById(id).setAttribute("disabled", true);
+        }
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", hideInputToggle);
+</script>

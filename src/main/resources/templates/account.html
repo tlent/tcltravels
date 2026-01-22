@@ -131,29 +131,6 @@
         </tr>
         <tr>
           <td>
-            Credit Card:
-            <span
-              id="S_credit_card"
-              th:text="*{'xxxx-xxxx-xxxx-' + creditCardNumber.substring(creditCardNumber.length() - 4)}"
-              >Credit Card Number</span
-            >
-            <input
-              type="text"
-              id="I_credit_card"
-              class="mediumtext"
-              th:field="*{creditCardNumber}"
-            />
-
-            <span
-              class="redtext error"
-              th:if="${#fields.hasErrors('creditCardNumber')}"
-              th:errors="*{creditCardNumber}"
-              >Invalid Credit Card [Enter 16 digits]</span
-            >
-          </td>
-        </tr>
-        <tr>
-          <td>
             Telephone:
             <span id="S_telephone" th:text="*{telephone}">Telephone</span>
             <input

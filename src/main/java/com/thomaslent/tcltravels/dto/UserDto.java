@@ -25,8 +25,6 @@ public class UserDto {
   @Pattern(regexp = "^\\d{5}$", message = "ZIP must be exactly 5 digits")
   private String zipcode;
 
-  @Pattern(regexp = "^\\d{16}$", message = "Credit card must be 16 digits")
-  private String creditCardNumber;
 
   @NotBlank(message = "Address is required")
   @Size(min = 6)
@@ -89,14 +87,6 @@ public class UserDto {
 
   public void setZipcode(String zipcode) {
     this.zipcode = zipcode;
-  }
-
-  public String getCreditCardNumber() {
-    return creditCardNumber;
-  }
-
-  public void setCreditCardNumber(String creditCard) {
-    this.creditCardNumber = creditCard;
   }
 
   public String getTelephone() {

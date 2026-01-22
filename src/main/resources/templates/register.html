@@ -117,24 +117,6 @@
 
             <tr>
               <td class="align_right">
-                Credit Card Number<br /><span class="smalltext"
-                  >(16 Digits)</span
-                >
-              </td>
-              <td>
-                <input type="text" th:field="*{creditCardNumber}" />
-                <span
-                  class="error"
-                  th:if="${#fields.hasErrors('creditCardNumber')}"
-                  th:errors="*{creditCardNumber}"
-                >
-                  Invalid Credit Card [Enter 16 digits]
-                </span>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="align_right">
                 Telephone <br /><span class="smalltext">(10-11 Digits)</span>
               </td>
               <td>

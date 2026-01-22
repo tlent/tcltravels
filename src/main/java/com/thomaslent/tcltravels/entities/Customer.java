@@ -21,9 +21,6 @@ public class Customer {
   @Column(name = "account_number")
   private Long accountNumber;
 
-  @Column(name = "credit_card_number", nullable = false, length = 16)
-  private String creditCardNumber;
-
   @Column(nullable = false)
   private String email;
 
@@ -47,14 +44,6 @@ public class Customer {
 
   public void setAccountNumber(Long accountNumber) {
     this.accountNumber = accountNumber;
-  }
-
-  public String getCreditCardNumber() {
-    return creditCardNumber;
-  }
-
-  public void setCreditCardNumber(String creditCardNumber) {
-    this.creditCardNumber = creditCardNumber;
   }
 
   public String getEmail() {

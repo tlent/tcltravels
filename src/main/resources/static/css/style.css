@@ -365,9 +365,6 @@ table td {
 .register_table #telephone {
   width: 90px;
 }
-.register_table #credit_card {
-  width: 125px;
-}
 .register_table #SSN {
   width: 75px;
 }

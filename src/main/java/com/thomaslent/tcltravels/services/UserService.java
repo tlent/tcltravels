@@ -30,7 +30,6 @@ public class UserService {
 
   public UserDto getUserDto(Long id) {
     Person person = personRepository.findById(id).get();
-    Customer customer = customerRepository.findByPerson(person).get();
     User user = userRepository.findByPerson(person).get();
 
     UserDto userDto = new UserDto();
@@ -41,7 +40,6 @@ public class UserService {
     userDto.setState(person.getState());
     userDto.setZipcode(person.getZipCode().toString());
     userDto.setTelephone(person.getTelephone());
-    userDto.setCreditCardNumber(customer.getCreditCardNumber());
     userDto.setEmail(user.getUsername());
 
     return userDto;
@@ -66,7 +64,6 @@ public class UserService {
     userRepository.save(user);
 
     Customer customer = new Customer();
-    customer.setCreditCardNumber(dto.getCreditCardNumber());
     customer.setEmail(dto.getEmail());
     customer.setPerson(person);
     customerRepository.save(customer);
@@ -89,9 +86,6 @@ public class UserService {
     person.setZipCode(Integer.parseInt(dto.getZipcode()));
     person = personRepository.save(person);
 
-    Customer customer = customerRepository.findByPerson(person).get();
-    customer.setCreditCardNumber(dto.getCreditCardNumber());
-    customerRepository.save(customer);
     return true;
   }
 }

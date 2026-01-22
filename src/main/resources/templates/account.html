@@ -1,5 +1,5 @@
 <div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - ${#authentication.principal.fullName}')}"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - ${#authentication.principal.fullName}', ~{fragments/scripts :: account})}"
 >
   <main>
     <form
@@ -24,14 +24,14 @@
               id="I_firstName"
               class="bigtext"
               th:field="*{firstName}"
-              onkeyup="resize('I_firstName', 35)"
+              data-resize-font="35"
             />
             <input
               type="text"
               id="I_lastName"
               class="bigtext"
               th:field="*{lastName}"
-              onkeyup="resize('I_lastName', 35)"
+              data-resize-font="35"
             />
             <span class="hint greytext" style="display: none; float: right"
               >Click on the field you want to change.</span
@@ -192,14 +192,12 @@
               type="button"
               id="e_button"
               value="Edit"
-              onclick="toggleEditable(1)"
               class="toggle_button2"
             />
             <input
               type="reset"
               id="c_button"
               value="Cancel"
-              onclick="toggleEditable(0)"
               class="toggle_button1"
             />
           </td>
@@ -208,41 +206,3 @@
     </form>
   </main>
 </div>
-<script>
-  function resize(id, font) {
-    var size = font * 0.7;
-    const element = document.getElementById(id);
-    element.width = element.value.length * size;
-  }
-
-  function toggleEditable(choice) {
-    let display1;
-    let display2;
-    if (choice === 1) {
-      display1 = "inline";
-      display2 = "none";
-    } else {
-      display1 = "none";
-      display2 = "inline-block";
-    }
-    document.getElementById("s_button").style.display = display1;
-    document.getElementById("e_button").style.display = display2;
-    document.getElementById("c_button").style.display = display1;
-    document.getElementById("I_firstName").style.width =
-      2 + document.getElementById("S_firstName").offsetWidth + "px";
-    document.getElementById("I_lastName").style.width =
-      2 + document.getElementById("S_lastName").offsetWidth + "px";
-    document
-      .querySelectorAll("*[id*=I_]")
-      .forEach((element) => (element.style.display = display1));
-    document
-      .querySelectorAll("*[id*=S_]")
-      .forEach((element) => (element.style.display = display2));
-    document
-      .querySelectorAll(".hint")
-      .forEach((element) => (element.style.display = display1));
-    document
-      .querySelectorAll(".error")
-      .forEach((element) => (element.style.display = "none"));
-  }
-</script>

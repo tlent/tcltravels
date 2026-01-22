@@ -31,9 +31,8 @@
         ></td>
         <td class="align_middle">
           <button
-            th:id="|btn_${r.reservationNumber}|"
             type="button"
-            th:onclick="|expandItinerary('${r.reservationNumber}')|"
+            th:attr="data-itinerary-toggle=${'itin_' + r.reservationNumber}"
           >
             Expand
           </button>

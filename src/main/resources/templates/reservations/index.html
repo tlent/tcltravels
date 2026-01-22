@@ -1,5 +1,5 @@
 <div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reservations')}"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reservations', ~{fragments/scripts :: reservations})}"
 >
   <main>
     <div th:replace="~{reservations/modules/current :: current_list}"></div>

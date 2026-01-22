@@ -1,5 +1,5 @@
 <div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reserve Flight')}"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reserve Flight', ~{fragments/scripts :: reservations})}"
 >
   <main>
     <div th:object="${reservationForm}">
@@ -56,7 +56,7 @@
           </tr>
           <tr>
               <td>
-                  <select id="passengerCount" th:field="*{passengerCount}" onchange="hideInputToggle()">
+                  <select id="passengerCount" th:field="*{passengerCount}" data-passenger-count>
                       <option value="1">1 Person</option>
                       <option value="2">2 People</option>
                       <option value="3">3 People</option>
@@ -113,33 +113,3 @@
     </div>
   </main>
 </div>
-<script>
-  const hideInputToggle = () => {
-    const count = Number(document.getElementById("passengerCount").value);
-    for (let i = 1; i <= 5; i++) {
-      const toggleDisplayIds = [`person${i}_head`, `person${i}`];
-      const toggleDisableIds = [
-        `first${i}`,
-        `last${i}`,
-        `class${i}`,
-        `food${i}`,
-      ];
-      if (count >= i) {
-        for (const id of toggleDisplayIds) {
-          document.getElementById(id).style.display = "table-row";
-        }
-        for (const id of toggleDisableIds) {
-          document.getElementById(id).removeAttribute("disabled");
-        }
-      } else {
-        for (const id of toggleDisplayIds) {
-          document.getElementById(id).style.display = "none";
-        }
-        for (const id of toggleDisableIds) {
-          document.getElementById(id).setAttribute("disabled", true);
-        }
-      }
-    }
-  };
-  document.addEventListener("DOMContentLoaded", hideInputToggle);
-</script>

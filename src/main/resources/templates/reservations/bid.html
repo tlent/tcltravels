@@ -1,5 +1,5 @@
 <div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Place Bid')}"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Place Bid', ~{fragments/scripts :: none})}"
 >
   <main>
     <div th:object="${bidForm}">

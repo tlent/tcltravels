@@ -1,5 +1,5 @@
 <div xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Help Page')}">
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Help Page', ~{fragments/scripts :: help})}">
   <main>
     <div id="user_help" sec:authorize="hasRole('CUSTOMER')">
       <select class="select_style" id="toMove">
@@ -171,18 +171,3 @@
     </div>
   </main>
 </div>
-
-<script type="text/javascript">
-  document.addEventListener("DOMContentLoaded", () => {
-    const toMoveElement = document.querySelector("#toMove");
-    toMoveElement.addEventListener("change", () => {
-      const target = document.getElementById(toMoveElement.value);
-      if (target) {
-        target.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    });
-  });
-</script>

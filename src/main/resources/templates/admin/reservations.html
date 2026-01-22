@@ -1,4 +1,4 @@
-<div th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reservations')}">
+<div th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reservations', ~{fragments/scripts :: admin})}">
   <main>
     <form th:action="@{/admin/reservations}" method="get">
       <div class="table_header" th:if="${!flightOptions.isEmpty()}">

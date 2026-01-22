@@ -1,5 +1,5 @@
 <div xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Admin Panel')}">
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Admin Panel', ~{fragments/scripts :: admin})}">
   <main>
     <div class="table_header">Top Customer</div>
     <table class="wide_table">

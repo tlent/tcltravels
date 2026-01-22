@@ -31,9 +31,8 @@
         ></td>
         <td class="align_middle">
           <button
-            th:id="|btn_${r.reservationNumber}|"
             type="button"
-            th:onclick="|expandItinerary('${r.reservationNumber}')|"
+            th:attr="data-itinerary-toggle=${'itin_' + r.reservationNumber}"
           >
             Expand
           </button>
@@ -92,16 +91,3 @@
     </tbody>
   </table>
 </div>
-<script>
-  function expandItinerary(reservationNumber) {
-    const button = document.getElementById("btn_" + reservationNumber);
-    const itinerary = document.getElementById("itin_" + reservationNumber);
-    if (button.innerText === "Expand") {
-      button.innerText = "Close";
-      itinerary.style.display = "table-row";
-    } else {
-      button.innerText = "Expand";
-      itinerary.style.display = "none";
-    }
-  }
-</script>

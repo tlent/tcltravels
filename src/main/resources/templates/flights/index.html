@@ -1,5 +1,5 @@
 <div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Flights')}"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Flights', ~{fragments/scripts :: none})}"
 >
   <main>
     <div th:replace="~{flights/modules/filter :: filter_box}"></div>

@@ -3,6 +3,8 @@ package com.thomaslent.tcltravels.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -10,6 +12,14 @@ import jakarta.persistence.Table;
 public class ReservationPassenger {
   @EmbeddedId
   private ReservationPassengerId id;
+
+  @ManyToOne
+  @JoinColumn(name = "reservation_number", referencedColumnName = "reservation_number", insertable = false, updatable = false)
+  private Reservation reservation;
+
+  @ManyToOne
+  @JoinColumn(name = "passenger_id", referencedColumnName = "id", insertable = false, updatable = false)
+  private Passenger passenger;
 
   @Column(name = "seat_number")
   private Integer seatNumber;
@@ -26,6 +36,22 @@ public class ReservationPassenger {
 
   public void setId(ReservationPassengerId id) {
     this.id = id;
+  }
+
+  public Reservation getReservation() {
+    return reservation;
+  }
+
+  public void setReservation(Reservation reservation) {
+    this.reservation = reservation;
+  }
+
+  public Passenger getPassenger() {
+    return passenger;
+  }
+
+  public void setPassenger(Passenger passenger) {
+    this.passenger = passenger;
   }
 
   public Integer getSeatNumber() {

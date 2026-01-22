@@ -11,6 +11,16 @@ import com.thomaslent.tcltravels.entities.Flight;
 import com.thomaslent.tcltravels.entities.FlightId;
 
 public interface FlightRepository extends JpaRepository<Flight, FlightId> {
+  List<Flight> findAllByOrderByIdAirlineIdAscIdFlightNumberAsc();
+
+  @Query("""
+      select distinct f
+      from Flight f
+      join StopsAt s on s.id.flightId = f.id
+      where s.airport.id = :airportId
+      order by f.id.airlineId, f.id.flightNumber
+      """)
+  List<Flight> findByAirportId(@Param("airportId") String airportId);
   @Query(value = """
       SELECT f.airline_id AS airlineId,
               f.flight_number AS flightNumber,

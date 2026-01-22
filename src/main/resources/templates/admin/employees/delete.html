@@ -1,0 +1,25 @@
+<div th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Delete Employee')}">
+  <main>
+    <div id="delete_employee_box" class="bg1 bigshadow" style="height: 200px;">
+      <div
+        class="bg2 bigshadow text_shadow1"
+        style="height: 40px; text-align: center; color: #fff; padding: 10px 0; font-weight: bold; font-size: 26px;"
+      >
+        Delete Employee Account?
+      </div>
+
+      <div style="text-align: center;">
+        <form th:action="@{/admin/employees/{personId}/delete(personId=${personId})}" method="post">
+          <table class="register_table">
+            <tr>
+              <td style="text-align: center; width: 600px;">
+                <input type="submit" value="Delete" />
+                <a th:href="@{/admin}"><input type="button" value="Cancel" /></a>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>

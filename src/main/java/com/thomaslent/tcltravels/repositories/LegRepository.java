@@ -2,15 +2,38 @@ package com.thomaslent.tcltravels.repositories;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.thomaslent.tcltravels.dto.FlightActivityRow;
 import com.thomaslent.tcltravels.dto.ReservationLegRow;
 import com.thomaslent.tcltravels.entities.Leg;
 import com.thomaslent.tcltravels.entities.LegId;
 
 public interface LegRepository extends JpaRepository<Leg, LegId> {
+  Leg findFirstByReservationReservationNumberOrderByIdLegNumberAsc(Long reservationNumber);
+
+  List<Leg> findByReservationReservationNumberInAndIdLegNumber(
+      List<Long> reservationNumbers, Integer legNumber);
+
+  @Query("""
+      select new com.thomaslent.tcltravels.dto.FlightActivityRow(
+        f.id.airlineId,
+        f.airline.name,
+        f.id.flightNumber,
+        f.numberOfSeats,
+        f.daysOperating,
+        count(distinct l.reservation.reservationNumber)
+      )
+      from Leg l
+      join l.flight f
+      group by f.id.airlineId, f.airline.name, f.id.flightNumber, f.numberOfSeats, f.daysOperating
+      order by count(distinct l.reservation.reservationNumber) desc
+      """)
+  List<FlightActivityRow> findMostActiveFlights(Pageable pageable);
+
   @Query(value = """
         SELECT
           l.reservation_number AS reservationNumber,

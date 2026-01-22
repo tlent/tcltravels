@@ -1,0 +1,108 @@
+<div th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Reservations')}">
+  <main>
+    <form th:action="@{/admin/reservations}" method="get">
+      <div class="table_header" th:if="${!flightOptions.isEmpty()}">
+        Reservations for Flight [<span th:text="${selectedFlightKey.substring(0,2)}">AA</span>]
+        <span th:text="${selectedFlightKey.substring(2)}">000</span>
+      </div>
+      <div class="table_header" th:if="${flightOptions.isEmpty()}">Reservations for Flight</div>
+      <table class="wide_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="light_gradient" style="padding: 10px;">
+            Pick a Flight<br />
+            <select name="flight">
+              <option
+                th:each="f : ${flightOptions}"
+                th:value="${f.airlineId() + f.flightNumber()}"
+                th:selected="${selectedFlightKey == f.airlineId() + f.flightNumber()}"
+                th:text="${'(' + f.airlineId() + ') ' + f.flightNumber()}"
+              ></option>
+            </select>
+            <input type="submit" value="View Reservations" style="margin-top: 10px;" />
+          </td>
+          <td class="light_gradient">
+            <table id="sales_report_table" class="wide_table" style="width: 600px;">
+              <tr>
+                <th>Resv. No.</th>
+                <th>Customer</th>
+                <th>Resv. Date</th>
+                <th>Booking Fee</th>
+                <th>Total Fare</th>
+              </tr>
+              <tr th:if="${flightReservations.isEmpty()}">
+                <td colspan="5">
+                  <div class="table_message">There were no reservations made on this flight</div>
+                </td>
+              </tr>
+              <tr th:each="r : ${flightReservations}">
+                <td th:text="${r.reservationNumber()}">0</td>
+                <td th:text="${r.customerName()}">Customer</td>
+                <td th:text="${#temporals.format(r.reservationDate(), 'MMMM d, yyyy | hh:mm a')}">Date</td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.bookingFee(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.totalFare(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <div class="table_header">
+        Reservations for Customer:
+        <span th:text="${selectedCustomerName.isBlank() ? 'Customer' : selectedCustomerName}">Customer</span>
+      </div>
+      <table class="wide_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="light_gradient" style="padding: 10px;">
+            Pick a Customer<br />
+            <select name="customer">
+              <option
+                th:each="c : ${customerOptions}"
+                th:value="${c.accountNumber()}"
+                th:selected="${selectedCustomer == c.accountNumber()}"
+                th:text="${c.firstName() + ' ' + c.lastName()}"
+              ></option>
+            </select>
+            <input type="submit" value="View Reservations" style="margin-top: 10px;" />
+          </td>
+          <td class="light_gradient">
+            <table id="sales_report_table" class="wide_table" style="width: 600px;">
+              <tr>
+                <th>Resv. No.</th>
+                <th>Flight</th>
+                <th>Resv. Date</th>
+                <th>Booking Fee</th>
+                <th>Total Fare</th>
+              </tr>
+              <tr th:if="${customerReservations.isEmpty()}">
+                <td colspan="5">
+                  <div class="table_message">This customer never reserved a flight</div>
+                </td>
+              </tr>
+              <tr th:each="r : ${customerReservations}">
+                <td th:text="${r.reservationNumber()}">0</td>
+                <td th:text="${'(' + r.airlineId() + ') ' + r.flightNumber()}">(AA) 000</td>
+                <td th:text="${#temporals.format(r.reservationDate(), 'MMMM d, yyyy | hh:mm a')}">Date</td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.bookingFee(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.totalFare(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </main>
+</div>

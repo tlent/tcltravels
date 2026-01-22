@@ -1,0 +1,306 @@
+<div th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Sales')}">
+  <main>
+    <div class="bigtext align_right" style="color: #aaa; margin-bottom: -18px;">
+      Top Customer and Customer Rep
+    </div>
+
+    <div class="table_header">Top Customer</div>
+    <table class="wide_table">
+      <tr>
+        <th></th>
+      </tr>
+      <tr>
+        <td class="light_gradient" style="font-size: 20px; padding: 10px 26px;">
+          <span th:if="${topCustomer != null}">
+            <span th:text="${topCustomer.firstName() + ' ' + topCustomer.lastName()}">Top Customer</span>
+            | <span class="greytext mediumtext">Generating a maximum total revenue of:</span>
+            $<span
+              th:text="${#numbers.formatDecimal(topCustomer.totalRevenue(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+          </span>
+          <span class="table_message" th:if="${topCustomer == null}">No customers yet</span>
+        </td>
+      </tr>
+    </table>
+
+    <div class="table_header">Top Customer Rep</div>
+    <table class="wide_table">
+      <tr>
+        <th></th>
+      </tr>
+      <tr>
+        <td class="light_gradient" style="font-size: 20px; padding: 10px 26px;">
+          <span th:if="${topEmployee != null}">
+            <span th:text="${topEmployee.firstName() + ' ' + topEmployee.lastName()}">Top Employee</span>
+            | <span class="greytext mediumtext">Generating a maximum total revenue of:</span>
+            $<span
+              th:text="${#numbers.formatDecimal(topEmployee.totalRevenue(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+          </span>
+          <span class="table_message" th:if="${topEmployee == null}">No reps yet</span>
+        </td>
+      </tr>
+    </table>
+
+    <form th:action="@{/admin/sales}" method="get">
+      <div class="bigtext align_right" style="color: #aaa; margin-bottom: -18px;">
+        Monthly Sales Report
+      </div>
+      <div class="table_header">
+        Sales Report for
+        <span
+          th:text="${T(java.time.Month).of(selectedMonth).getDisplayName(T(java.time.format.TextStyle).FULL, T(java.util.Locale).ENGLISH)}"
+          >Month</span>
+        ,
+        <span th:text="${selectedYear}">Year</span>
+      </div>
+      <table class="wide_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="light_gradient" style="padding: 10px;">
+            Month&nbsp;&nbsp;&nbsp;Year<br />
+            <select name="month">
+              <option
+                th:each="m : ${months}"
+                th:value="${m.value}"
+                th:selected="${m.value == selectedMonth}"
+                th:text="${#strings.capitalize(m.name().toLowerCase())}"
+              ></option>
+            </select>
+            <select name="year">
+              <option
+                th:each="y : ${years}"
+                th:value="${y}"
+                th:selected="${y == selectedYear}"
+                th:text="${y}"
+              ></option>
+            </select>
+            <input type="submit" value="View Sales Report" style="margin-top: 10px;" />
+          </td>
+          <td class="light_gradient">
+            <table id="sales_report_table" class="wide_table" style="width: 600px;">
+              <tr>
+                <th>Resv. No.</th>
+                <th>Customer</th>
+                <th>Resv. Date</th>
+                <th>Booking Fee</th>
+                <th>Total Fare</th>
+              </tr>
+              <tr th:if="${monthSales.isEmpty()}">
+                <td colspan="5">
+                  <div class="table_message">There were no flights sold during this month</div>
+                </td>
+              </tr>
+              <tr th:each="r : ${monthSales}">
+                <td th:text="${r.reservationNumber()}">0</td>
+                <td th:text="${r.customerName()}">Customer</td>
+                <td th:text="${#temporals.format(r.reservationDate(), 'MMMM d, yyyy | hh:mm a')}">Date</td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.bookingFee(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.totalFare(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+              </tr>
+              <tr th:if="${monthTotal.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+                <td colspan="4" class="align_right">
+                  <div class="mediumtext">Total Revenue Generated:</div>
+                </td>
+                <td class="align_right">
+                  <div class="mediumtext">
+                    $<span th:text="${#numbers.formatDecimal(monthTotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <div class="bigtext align_right" style="color: #aaa; margin-bottom: -18px;">
+        Other Detailed Sales Reports
+      </div>
+
+      <div class="table_header" th:if="${!flightOptions.isEmpty()}">
+        Sales Report for Flight [<span th:text="${selectedFlightKey.substring(0,2)}">AA</span>]
+        <span th:text="${selectedFlightKey.substring(2)}">000</span>
+      </div>
+      <div class="table_header" th:if="${flightOptions.isEmpty()}">Sales Report for Flight</div>
+      <table class="wide_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="light_gradient" style="padding: 10px;">
+            Pick a Flight<br />
+            <select name="flight">
+              <option
+                th:each="f : ${flightOptions}"
+                th:value="${f.airlineId() + f.flightNumber()}"
+                th:selected="${selectedFlightKey == f.airlineId() + f.flightNumber()}"
+                th:text="${'(' + f.airlineId() + ') ' + f.flightNumber()}"
+              ></option>
+            </select>
+            <input type="submit" value="View Sales Report" style="margin-top: 10px;" />
+          </td>
+          <td class="light_gradient">
+            <table id="sales_report_table" class="wide_table" style="width: 600px;">
+              <tr>
+                <th>Resv. No.</th>
+                <th>Customer</th>
+                <th>Resv. Date</th>
+                <th>Booking Fee</th>
+                <th>Total Fare</th>
+              </tr>
+              <tr th:if="${flightSales.isEmpty()}">
+                <td colspan="5">
+                  <div class="table_message">There were no reservations made on this flight</div>
+                </td>
+              </tr>
+              <tr th:each="r : ${flightSales}">
+                <td th:text="${r.reservationNumber()}">0</td>
+                <td th:text="${r.customerName()}">Customer</td>
+                <td th:text="${#temporals.format(r.reservationDate(), 'MMMM d, yyyy | hh:mm a')}">Date</td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.bookingFee(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.totalFare(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+              </tr>
+              <tr th:if="${flightTotal.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+                <td colspan="4" class="align_right">
+                  <div class="mediumtext">Total Revenue Generated:</div>
+                </td>
+                <td class="align_right">
+                  <div class="mediumtext">
+                    $<span th:text="${#numbers.formatDecimal(flightTotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <div class="table_header">
+        Sales Report for Customer:
+        <span th:text="${selectedCustomerName.isBlank() ? 'Customer' : selectedCustomerName}">Customer</span>
+      </div>
+      <table class="wide_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="light_gradient" style="padding: 10px;">
+            Pick a Customer<br />
+            <select name="customer">
+              <option
+                th:each="c : ${customerOptions}"
+                th:value="${c.accountNumber()}"
+                th:selected="${selectedCustomer == c.accountNumber()}"
+                th:text="${c.firstName() + ' ' + c.lastName()}"
+              ></option>
+            </select>
+            <input type="submit" value="View Sales Report" style="margin-top: 10px;" />
+          </td>
+          <td class="light_gradient">
+            <table id="sales_report_table" class="wide_table" style="width: 600px;">
+              <tr>
+                <th>Resv. No.</th>
+                <th>Flight</th>
+                <th>Resv. Date</th>
+                <th>Booking Fee</th>
+                <th>Total Fare</th>
+              </tr>
+              <tr th:if="${customerSales.isEmpty()}">
+                <td colspan="5">
+                  <div class="table_message">This customer never reserved a flight</div>
+                </td>
+              </tr>
+              <tr th:each="r : ${customerSales}">
+                <td th:text="${r.reservationNumber()}">0</td>
+                <td th:text="${'(' + r.airlineId() + ') ' + r.flightNumber()}">(AA) 000</td>
+                <td th:text="${#temporals.format(r.reservationDate(), 'MMMM d, yyyy | hh:mm a')}">Date</td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.bookingFee(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.totalFare(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+              </tr>
+              <tr th:if="${customerTotal.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+                <td colspan="4" class="align_right">
+                  <div class="mediumtext">Total Revenue Generated:</div>
+                </td>
+                <td class="align_right">
+                  <div class="mediumtext">
+                    $<span th:text="${#numbers.formatDecimal(customerTotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <div class="table_header">Sales Report for <span th:text="${selectedCity}">City</span></div>
+      <table class="wide_table">
+        <tr>
+          <th colspan="2"></th>
+        </tr>
+        <tr>
+          <td class="light_gradient" style="padding: 10px;">
+            Pick a Destination City<br />
+            <select name="city">
+              <option
+                th:each="c : ${cityOptions}"
+                th:value="${c}"
+                th:selected="${selectedCity == c}"
+                th:text="${c}"
+              ></option>
+            </select>
+            <input type="submit" value="View Sales Report" style="margin-top: 10px;" />
+          </td>
+          <td class="light_gradient">
+            <table id="sales_report_table" class="wide_table" style="width: 600px;">
+              <tr>
+                <th>Resv. No.</th>
+                <th>Flight</th>
+                <th>Resv. Date</th>
+                <th>Booking Fee</th>
+                <th>Total Fare</th>
+              </tr>
+              <tr th:if="${citySales.isEmpty()}">
+                <td colspan="5">
+                  <div class="table_message">No flights were reserved for this city</div>
+                </td>
+              </tr>
+              <tr th:each="r : ${citySales}">
+                <td th:text="${r.reservationNumber()}">0</td>
+                <td th:text="${'(' + r.airlineId() + ') ' + r.flightNumber()}">(AA) 000</td>
+                <td th:text="${#temporals.format(r.reservationDate(), 'MMMM d, yyyy | hh:mm a')}">Date</td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.bookingFee(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+                <td class="align_right">
+                  $<span th:text="${#numbers.formatDecimal(r.totalFare(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </td>
+              </tr>
+              <tr th:if="${cityTotal.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+                <td colspan="4" class="align_right">
+                  <div class="mediumtext">Total Revenue Generated:</div>
+                </td>
+                <td class="align_right">
+                  <div class="mediumtext">
+                    $<span th:text="${#numbers.formatDecimal(cityTotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </main>
+</div>

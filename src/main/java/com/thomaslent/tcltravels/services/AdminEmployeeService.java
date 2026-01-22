@@ -58,7 +58,7 @@ public class AdminEmployeeService {
     form.setAddress(person.getAddress());
     form.setCity(person.getCity());
     form.setState(person.getState());
-    form.setZipcode(person.getZipCode() != null ? person.getZipCode().toString() : "");
+    form.setZipcode(person.getZipCode() != null ? person.getZipCode() : "");
     form.setTelephone(person.getTelephone());
     form.setSsn(employee.getSsn() != null ? employee.getSsn().toString() : "");
     form.setStartDate(employee.getStartDate() != null ? employee.getStartDate().format(DATE_FORMATTER) : "");
@@ -76,7 +76,7 @@ public class AdminEmployeeService {
     person.setCity(form.getCity());
     person.setState(form.getState().toUpperCase());
     person.setTelephone(form.getTelephone());
-    person.setZipCode(Integer.parseInt(form.getZipcode()));
+    person.setZipCode(form.getZipcode());
     person = personRepository.save(person);
 
     User user = new User();
@@ -108,7 +108,7 @@ public class AdminEmployeeService {
     person.setCity(form.getCity());
     person.setState(form.getState().toUpperCase());
     person.setTelephone(form.getTelephone());
-    person.setZipCode(Integer.parseInt(form.getZipcode()));
+    person.setZipCode(form.getZipcode());
     personRepository.save(person);
 
     employee.setSsn(Integer.parseInt(form.getSsn()));

@@ -38,7 +38,7 @@ public class UserService {
     userDto.setAddress(person.getAddress());
     userDto.setCity(person.getCity());
     userDto.setState(person.getState());
-    userDto.setZipcode(person.getZipCode().toString());
+    userDto.setZipcode(person.getZipCode());
     userDto.setTelephone(person.getTelephone());
     userDto.setEmail(user.getUsername());
 
@@ -54,7 +54,7 @@ public class UserService {
     person.setCity(dto.getCity());
     person.setState(dto.getState().toUpperCase());
     person.setTelephone(dto.getTelephone());
-    person.setZipCode(Integer.parseInt(dto.getZipcode()));
+    person.setZipCode(dto.getZipcode());
     person = personRepository.save(person);
 
     User user = new User();
@@ -83,7 +83,7 @@ public class UserService {
     person.setCity(dto.getCity());
     person.setState(dto.getState().toUpperCase());
     person.setTelephone(dto.getTelephone());
-    person.setZipCode(Integer.parseInt(dto.getZipcode()));
+    person.setZipCode(dto.getZipcode());
     person = personRepository.save(person);
 
     return true;

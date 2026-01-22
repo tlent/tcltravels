@@ -27,7 +27,7 @@ public class Person {
   private String state;
 
   @Column(name = "zip_code", nullable = false)
-  private Integer zipCode;
+  private String zipCode;
 
   @Column(nullable = false)
   private String telephone;
@@ -80,11 +80,11 @@ public class Person {
     this.state = state;
   }
 
-  public Integer getZipCode() {
+  public String getZipCode() {
     return zipCode;
   }
 
-  public void setZipCode(Integer zipCode) {
+  public void setZipCode(String zipCode) {
     this.zipCode = zipCode;
   }
 

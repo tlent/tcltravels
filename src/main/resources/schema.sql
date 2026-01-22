@@ -36,10 +36,7 @@ CREATE TABLE persons (
   address TEXT,
   city TEXT,
   state CHAR(2),
-  zip_code INTEGER NOT NULL CHECK (
-    zip_code BETWEEN 10000
-    AND 99999
-  ),
+  zip_code TEXT NOT NULL CHECK (zip_code ~ '^\d{5}$'),
   telephone TEXT NOT NULL CHECK (telephone ~ '^\d{10,11}$'),
   PRIMARY KEY (id)
 );

@@ -24,6 +24,7 @@
 
       <div style="text-align: center; position: relative; height: 200px">
         <form id="form_login" th:action="@{/login}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
           <table style="margin-top: 20px">
             <tr>
               <td style="text-align: right">User:</td>
@@ -38,23 +39,23 @@
           <input type="submit" value="Login" />
 
           <div class="text_shadow2" style="color: #fff; font-weight: bold; margin: 10px;">
-            <p th:if="${param.authValid != null and param.authValid[0] == '0'}">
-                You must enter a valid username and password.
-            </p>
-
-            <p th:if="${param.authValid != null and param.authValid[0] == '-1'}">
+            <p th:if="${param.error != null}">
                 Incorrect username or password. Please try again.
             </p>
-        </div>
+            <p th:if="${param.logout != null}">
+                You have been logged out.
+            </p>
+          </div>
 
-        <div style="position: absolute; bottom: 0; width: 100%; padding: 20px 0;">
+          <div style="position: absolute; bottom: 0; width: 100%; padding: 20px 0;">
             <div th:if="${param.register != null and param.register[0] == 'true'}">
                 Now use your Username and Password to login.
             </div>
             <div th:unless="${param.register != null and param.register[0] == 'true'}">
                 If you're not a member, <a th:href="@{/register}">click here to register</a>
             </div>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   </body>

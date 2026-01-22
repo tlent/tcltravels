@@ -11,15 +11,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.thomaslent.tcltravels.dto.BidForm;
 import com.thomaslent.tcltravels.dto.ReservationView;
 import com.thomaslent.tcltravels.dto.ReservationForm;
 import com.thomaslent.tcltravels.dto.StopView;
+import com.thomaslent.tcltravels.security.UserPrincipal;
 import com.thomaslent.tcltravels.services.AuctionsService;
 import com.thomaslent.tcltravels.services.ReservationsService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
 
@@ -34,16 +36,9 @@ public class ReservationsController {
     }
 
     @GetMapping("/reservations")
-    public String getReservations(Model model, HttpSession session) {
-        if (session.getAttribute("p_id") == null) {
-            return "redirect:/login";
-        }
-        String role = (String) session.getAttribute("role");
-        if (!"Customer".equals(role)) {
-            return "redirect:/admin/reservations";
-        }
-
-        Long accountNumber = (Long) session.getAttribute("c_accountNumber");
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public String getReservations(Model model, @AuthenticationPrincipal UserPrincipal principal) {
+        Long accountNumber = principal.getAccountNumber();
         List<ReservationView> currentReservationViews = reservationsService.getCurrentReservations(accountNumber);
         model.addAttribute("current_reservations", currentReservationViews);
 
@@ -56,18 +51,11 @@ public class ReservationsController {
     }
 
     @GetMapping("/reservations/new")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public String createReservation(@RequestParam String airlineId,
         @RequestParam Integer flightNumber,
         @RequestParam(name = "departureDate", required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate departureDate,
-        Model model, HttpSession session) {
-        if (session.getAttribute("p_id") == null) {
-            return "redirect:/login";
-        }
-        String role = (String) session.getAttribute("role");
-        if (!"Customer".equals(role)) {
-            return "redirect:/admin/reservations";
-        }
-
+        Model model) {
         ReservationForm reservationForm = new ReservationForm();
         reservationForm.setAirlineId(airlineId);
         reservationForm.setFlightNumber(flightNumber);
@@ -86,18 +74,11 @@ public class ReservationsController {
     }
 
     @GetMapping("/reservations/bid")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public String placeBid(@RequestParam String airlineId,
         @RequestParam Integer flightNumber,
         @RequestParam(name = "departureDate", required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate departureDate,
-        Model model, HttpSession session) {
-        if (session.getAttribute("p_id") == null) {
-            return "redirect:/login";
-        }
-        String role = (String) session.getAttribute("role");
-        if (!"Customer".equals(role)) {
-            return "redirect:/admin/reservations";
-        }
-
+        Model model) {
         BidForm bidForm = new BidForm();
         bidForm.setAirlineId(airlineId);
         bidForm.setFlightNumber(flightNumber);
@@ -112,21 +93,15 @@ public class ReservationsController {
     }
 
     @PostMapping("/reservations")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public String submitReservation(@Valid @ModelAttribute("reservationForm") ReservationForm reservationForm,
-        BindingResult bindingResult, Model model, HttpSession session) {
-        if (session.getAttribute("p_id") == null) {
-            return "redirect:/login";
-        }
-        String role = (String) session.getAttribute("role");
-        if (!"Customer".equals(role)) {
-            return "redirect:/admin/reservations";
-        }
+        BindingResult bindingResult, Model model, @AuthenticationPrincipal UserPrincipal principal) {
         if (bindingResult.hasErrors()) {
             reloadReservationForm(model, reservationForm);
             return "reservations/new";
         }
 
-        Long accountNumber = (Long) session.getAttribute("c_accountNumber");
+        Long accountNumber = principal.getAccountNumber();
         reservationsService.createReservation(reservationForm, accountNumber)
             .ifPresent(error -> bindingResult.reject("reservationForm", error));
 
@@ -139,21 +114,15 @@ public class ReservationsController {
     }
 
     @PostMapping("/reservations/bid")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public String submitBid(@Valid @ModelAttribute("bidForm") BidForm bidForm, BindingResult bindingResult,
-        Model model, HttpSession session) {
-        if (session.getAttribute("p_id") == null) {
-            return "redirect:/login";
-        }
-        String role = (String) session.getAttribute("role");
-        if (!"Customer".equals(role)) {
-            return "redirect:/admin/reservations";
-        }
+        Model model, @AuthenticationPrincipal UserPrincipal principal) {
         if (bindingResult.hasErrors()) {
             return "reservations/bid";
         }
 
-        Long accountNumber = (Long) session.getAttribute("c_accountNumber");
-        Long personId = (Long) session.getAttribute("p_id");
+        Long accountNumber = principal.getAccountNumber();
+        Long personId = principal.getPersonId();
         ReservationsService.BidResult result = reservationsService.submitBid(bidForm, accountNumber, personId);
         if (result.error() != null) {
             bindingResult.reject("bidForm", result.error());

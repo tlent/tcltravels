@@ -6,11 +6,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.thomaslent.tcltravels.dto.UserDto;
+import com.thomaslent.tcltravels.security.UserPrincipal;
 import com.thomaslent.tcltravels.services.UserService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -22,9 +25,12 @@ public class UserController {
   }
 
   @GetMapping("/register")
-  public String showRegisterPage(HttpSession session, Model model) {
-    if (session.getAttribute("p_id") != null) {
-      return "redirect:/";
+  public String showRegisterPage(@AuthenticationPrincipal UserPrincipal principal, Model model) {
+    if (principal != null) {
+      boolean isCustomer = principal.getAuthorities().stream()
+          .map(GrantedAuthority::getAuthority)
+          .anyMatch("ROLE_CUSTOMER"::equals);
+      return isCustomer ? "redirect:/" : "redirect:/admin";
     }
     model.addAttribute("registerForm", new UserDto());
     return "register";
@@ -45,40 +51,26 @@ public class UserController {
   }
 
   @GetMapping("/account")
-  public String showAccountPage(HttpSession session, Model model) {
-    Long id = (Long) session.getAttribute("p_id");
-    if (id == null) {
-      return "redirect:/login";
-    }
-    if (!session.getAttribute("role").equals("Customer")) {
-      return "redirect:/";
-    }
-    UserDto userDto = userService.getUserDto(id);
+  @PreAuthorize("hasRole('CUSTOMER')")
+  public String showAccountPage(@AuthenticationPrincipal UserPrincipal principal, Model model) {
+    UserDto userDto = userService.getUserDto(principal.getPersonId());
     model.addAttribute("editUserForm", userDto);
     return "account";
   }
 
   @PostMapping("/account")
+  @PreAuthorize("hasRole('CUSTOMER')")
   public String editUser(@Valid @ModelAttribute("editUserForm") UserDto userDto, BindingResult bindingResult,
-      HttpSession session, Model model) {
-    Long id = (Long) session.getAttribute("p_id");
-    if (id == null) {
-      return "redirect:/login";
-    }
-    if (!session.getAttribute("role").equals("Customer")) {
-      return "redirect:/";
-    }
+      @AuthenticationPrincipal UserPrincipal principal, Model model) {
     if (bindingResult.hasErrors()) {
       return "account";
     }
-    boolean updated = userService.editCustomer(id, userDto);
+    boolean updated = userService.editCustomer(principal.getPersonId(), userDto);
     if (!updated) {
       bindingResult.rejectValue("password", "error.userDto", "Wrong Password");
       return "account";
     }
-    UserDto updatedUserDto = userService.getUserDto(id);
-    session.setAttribute("p_firstName", updatedUserDto.getFirstName());
-    session.setAttribute("p_lastName", updatedUserDto.getLastName());
+    UserDto updatedUserDto = userService.getUserDto(principal.getPersonId());
     model.addAttribute("editUserForm", updatedUserDto);
     return "account";
   }

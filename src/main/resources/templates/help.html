@@ -1,8 +1,7 @@
-<div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Help Page')}"
->
+<div xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Help Page')}">
   <main>
-    <div id="user_help" th:if="${session.role == 'Customer'}">
+    <div id="user_help" sec:authorize="hasRole('CUSTOMER')">
       <select class="select_style" id="toMove">
         <option value="resvflight">Reserving a Flight</option>
         <option value="bidflight">Bidding on a Flight</option>
@@ -86,7 +85,7 @@
         </tr>
       </table>
     </div>
-    <div id="employee_help" th:if="${session.role != 'Customer'}">
+    <div id="employee_help" sec:authorize="hasAnyRole('MANAGER','EMPLOYEE')">
       <select class="select_style" id="toMove">
         <option value="AddEdit">Add and Edit Employees</option>
         <option value="GetMonth">Get sales report by Month</option>

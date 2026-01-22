@@ -4,12 +4,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.thomaslent.tcltravels.services.FlightFilterService;
 import com.thomaslent.tcltravels.services.FlightsService;
 import com.thomaslent.tcltravels.services.ReservationsService;
-
-import jakarta.servlet.http.HttpSession;
+import com.thomaslent.tcltravels.security.UserPrincipal;
 
 @Controller
 @RequestMapping
@@ -26,16 +27,9 @@ public class IndexController {
   }
 
   @GetMapping("/")
-  public String index(Model model, HttpSession session) {
-    if (session.getAttribute("p_id") == null) {
-      return "redirect:/login";
-    }
-    String role = (String) session.getAttribute("role");
-    if (!"Customer".equals(role)) {
-      return "redirect:/admin/";
-    }
-
-    Long accountNumber = (Long) session.getAttribute("c_accountNumber");
+  @PreAuthorize("hasRole('CUSTOMER')")
+  public String index(Model model, @AuthenticationPrincipal UserPrincipal principal) {
+    Long accountNumber = principal.getAccountNumber();
     model.addAttribute("filter", flightFilterService.getFilterResult(null, null, null, null));
     model.addAttribute("recommended_flights", flightsService.getRecommendedFlights(accountNumber));
     model.addAttribute("current_reservations", reservationsService.getCurrentReservations(accountNumber));
@@ -43,10 +37,8 @@ public class IndexController {
   }
 
   @GetMapping("/help")
-  public String help(HttpSession session) {
-    if (session.getAttribute("p_id") == null) {
-      return "redirect:/login";
-    }
+  @PreAuthorize("isAuthenticated()")
+  public String help() {
     return "help";
   }
 }

@@ -3,7 +3,7 @@
     <div
       class="bigtext align_right"
       style="color: #aaa; margin-bottom: -18px"
-      th:text="'Welcome to TCL Travels, ' + ${session.p_firstName} + ' ' + ${session.p_lastName} + '!'"
+      th:text="'Welcome to TCL Travels, ' + ${#authentication.principal.fullName} + '!'"
     ></div>
 
     <div th:replace="~{flights/modules/filter :: filter_box}"></div>

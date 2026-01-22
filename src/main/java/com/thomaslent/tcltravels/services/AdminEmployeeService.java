@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.thomaslent.tcltravels.dto.AdminEmployeeView;
 import com.thomaslent.tcltravels.dto.EmployeeCreateForm;
@@ -27,12 +28,14 @@ public class AdminEmployeeService {
   private EmployeeRepository employeeRepository;
   private PersonRepository personRepository;
   private UserRepository userRepository;
+  private PasswordEncoder passwordEncoder;
 
   public AdminEmployeeService(EmployeeRepository employeeRepository, PersonRepository personRepository,
-      UserRepository userRepository) {
+      UserRepository userRepository, PasswordEncoder passwordEncoder) {
     this.employeeRepository = employeeRepository;
     this.personRepository = personRepository;
     this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   public List<AdminEmployeeView> getEmployees() {
@@ -81,7 +84,7 @@ public class AdminEmployeeService {
 
     User user = new User();
     user.setUsername(form.getEmail());
-    user.setPassword(form.getPassword());
+    user.setPassword(passwordEncoder.encode(form.getPassword()));
     user.setPerson(person);
     userRepository.save(user);
 

@@ -1,4 +1,5 @@
-<div th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Admin Panel')}">
+<div xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Admin Panel')}">
   <main>
     <div class="table_header">Top Customer</div>
     <table class="wide_table">
@@ -18,7 +19,7 @@
       </tr>
     </table>
 
-    <th:block th:if="${session.role == 'Manager'}">
+    <th:block sec:authorize="hasRole('MANAGER')">
       <div class="table_header">Top Customer Rep</div>
       <table class="wide_table">
         <tr>
@@ -44,7 +45,7 @@
         <th colspan="2"></th>
       </tr>
       <tr>
-        <td class="light_gradient" th:if="${session.role == 'Manager'}">
+        <td class="light_gradient" sec:authorize="hasRole('MANAGER')">
           <a th:href="@{/admin/employees/new}">
             <div class="big_button smallshadow text_shadow1">Add Employee</div>
           </a>
@@ -69,7 +70,7 @@
           <table
             id="employee_table"
             class="wide_table"
-            th:style="${session.role == 'Manager' ? 'width: 600px;' : 'width: 780px;'}"
+            th:style="${#authorization.expression('hasRole(''MANAGER'')') ? 'width: 600px;' : 'width: 780px;'}"
           >
             <thead>
               <tr>
@@ -77,7 +78,7 @@
                 <th>Status</th>
                 <th>Telephone</th>
                 <th>SSN</th>
-                <th th:if="${session.role == 'Manager'}">Hourly Rate</th>
+                <th sec:authorize="hasRole('MANAGER')">Hourly Rate</th>
               </tr>
             </thead>
             <tbody>
@@ -89,14 +90,14 @@
                 <td th:text="${e.isManager() ? 'Manager' : 'Employee'}">Status</td>
                 <td th:text="${e.telephone()}">Telephone</td>
                 <td th:with="ssnStr=${e.ssn() != null ? e.ssn().toString() : ''}">
-                  <span th:if="${session.role == 'Manager'}" th:text="${ssnStr}">SSN</span>
+                  <span sec:authorize="hasRole('MANAGER')" th:text="${ssnStr}">SSN</span>
                   <span
-                    th:if="${session.role != 'Manager'}"
+                    sec:authorize="!hasRole('MANAGER')"
                     th:text="${ssnStr.length() > 4 ? 'xxx-xx-' + #strings.substring(ssnStr, ssnStr.length() - 4) : 'xxx-xx-'}"
                     >SSN</span
                   >
                 </td>
-                <td th:if="${session.role == 'Manager'}" class="align_right">
+                <td sec:authorize="hasRole('MANAGER')" class="align_right">
                   $<span
                     th:text="${e.hourlyRate() != null ? #numbers.formatDecimal(e.hourlyRate(), 1, 'COMMA', 2, 'POINT') : '0.00'}"
                     >0.00</span

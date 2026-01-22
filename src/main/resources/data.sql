@@ -347,9 +347,9 @@ VALUES
 INSERT INTO
   app_users (username, password, person_id)
 VALUES
-  ('rickroller@rolld.com', 'password', 3),
-  ('awesomejane@ftw.com', 'password', 2),
-  ('jdoe@woot.com', 'password', 1);
+  ('rickroller@rolld.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 3),
+  ('awesomejane@ftw.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 2),
+  ('jdoe@woot.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5lu4bdpDT6vKrrfE0YyV1ypE1U9m6', 1);
 
 INSERT INTO
   passengers

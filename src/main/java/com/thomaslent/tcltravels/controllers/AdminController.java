@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.thomaslent.tcltravels.dto.AirportOptionView;
 import com.thomaslent.tcltravels.dto.CustomerOnFlightView;
@@ -24,8 +25,6 @@ import com.thomaslent.tcltravels.services.AdminEmployeeService;
 import com.thomaslent.tcltravels.services.AdminFlightsService;
 import com.thomaslent.tcltravels.services.AdminReportingService;
 import com.thomaslent.tcltravels.repositories.ReservationPassengerRepository;
-
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
@@ -44,14 +43,11 @@ public class AdminController {
   }
 
   @GetMapping({ "", "/" })
+  @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE')")
   public String getAdminDashboard(
       @RequestParam(name = "month", required = false) Integer month,
       @RequestParam(name = "year", required = false) Integer year,
-      Model model, HttpSession session) {
-    if (!isAdmin(session)) {
-      return redirectForRole(session);
-    }
-
+      Model model) {
     int selectedMonth = month == null ? 1 : month;
     int selectedYear = year == null ? 2011 : year;
 
@@ -73,17 +69,14 @@ public class AdminController {
   }
 
   @GetMapping("/sales")
+  @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE')")
   public String getSalesReport(
       @RequestParam(name = "month", required = false) Integer month,
       @RequestParam(name = "year", required = false) Integer year,
       @RequestParam(name = "flight", required = false) String flightKey,
       @RequestParam(name = "customer", required = false) Long customerId,
       @RequestParam(name = "city", required = false) String city,
-      Model model, HttpSession session) {
-    if (!isAdmin(session)) {
-      return redirectForRole(session);
-    }
-
+      Model model) {
     int selectedMonth = month == null ? 1 : month;
     int selectedYear = year == null ? 2011 : year;
 
@@ -138,14 +131,11 @@ public class AdminController {
   }
 
   @GetMapping("/reservations")
+  @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE')")
   public String getReservations(
       @RequestParam(name = "flight", required = false) String flightKey,
       @RequestParam(name = "customer", required = false) Long customerId,
-      Model model, HttpSession session) {
-    if (!isAdmin(session)) {
-      return redirectForRole(session);
-    }
-
+      Model model) {
     List<FlightOptionView> flightOptions = adminReportingService.getFlightOptions();
     String selectedFlightKey = selectFlightKey(flightKey, flightOptions);
     FlightOptionView selectedFlight = parseFlightKey(selectedFlightKey);
@@ -177,14 +167,11 @@ public class AdminController {
   }
 
   @GetMapping("/flights")
+  @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE')")
   public String getFlights(
       @RequestParam(name = "flight", required = false) String flightKey,
       @RequestParam(name = "airport", required = false) String airportId,
-      Model model, HttpSession session) {
-    if (!isAdmin(session)) {
-      return redirectForRole(session);
-    }
-
+      Model model) {
     List<FlightActivityView> mostActiveFlights = adminFlightsService.getMostActiveFlights();
     List<FlightSummaryView> allFlights = adminFlightsService.getAllFlights();
     model.addAttribute("mostActiveFlights", mostActiveFlights);
@@ -216,18 +203,6 @@ public class AdminController {
     model.addAttribute("airportFlights", airportFlights);
 
     return "admin/flights";
-  }
-
-  private boolean isAdmin(HttpSession session) {
-    String role = (String) session.getAttribute("role");
-    return session.getAttribute("p_id") != null && role != null && !"Customer".equals(role);
-  }
-
-  private String redirectForRole(HttpSession session) {
-    if (session.getAttribute("p_id") == null) {
-      return "redirect:/login";
-    }
-    return "redirect:/";
   }
 
   private String selectFlightKey(String flightKey, List<FlightOptionView> options) {

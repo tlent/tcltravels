@@ -1,9 +1,8 @@
 package com.thomaslent.tcltravels.services;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.thomaslent.tcltravels.dto.UserDto;
 import com.thomaslent.tcltravels.entities.Customer;
@@ -19,16 +18,14 @@ public class UserService {
   private PersonRepository personRepository;
   private UserRepository userRepository;
   private CustomerRepository customerRepository;
+  private PasswordEncoder passwordEncoder;
 
   public UserService(PersonRepository personRepository, UserRepository userRepository,
-      CustomerRepository customerRepository) {
+      CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
     this.personRepository = personRepository;
     this.userRepository = userRepository;
     this.customerRepository = customerRepository;
-  }
-
-  public Optional<User> findUser(String username, String password) {
-    return userRepository.findByUsernameAndPassword(username, password);
+    this.passwordEncoder = passwordEncoder;
   }
 
   public UserDto getUserDto(Long id) {
@@ -64,7 +61,7 @@ public class UserService {
 
     User user = new User();
     user.setUsername(dto.getEmail());
-    user.setPassword(dto.getPassword());
+    user.setPassword(passwordEncoder.encode(dto.getPassword()));
     user.setPerson(person);
     userRepository.save(user);
 
@@ -80,7 +77,7 @@ public class UserService {
     Person person = personRepository.findById(id).get();
     User user = userRepository.findByPerson(person).get();
     String password = dto.getPassword();
-    if (password == null || !password.equals(user.getPassword())) {
+    if (password == null || !passwordEncoder.matches(password, user.getPassword())) {
       return false;
     }
     person.setFirstName(dto.getFirstName());

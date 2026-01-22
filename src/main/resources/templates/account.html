@@ -1,5 +1,5 @@
 <div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - ${session.p_firstName} ${session.p_lastName}')}"
+  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - ${#authentication.principal.fullName}')}"
 >
   <main>
     <form
@@ -8,6 +8,7 @@
       th:object="${editUserForm}"
       method="post"
     >
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
       <table class="profile_table smallshadow mediumtext">
         <tr>
           <td rowspan="11" id="left_column"></td>

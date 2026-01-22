@@ -24,6 +24,7 @@ import com.thomaslent.tcltravels.dto.TopRevenueView;
 import com.thomaslent.tcltravels.services.AdminEmployeeService;
 import com.thomaslent.tcltravels.services.AdminFlightsService;
 import com.thomaslent.tcltravels.services.AdminReportingService;
+import com.thomaslent.tcltravels.services.AdminSelectionService;
 import com.thomaslent.tcltravels.repositories.ReservationPassengerRepository;
 
 @Controller
@@ -32,13 +33,16 @@ public class AdminController {
   private AdminReportingService adminReportingService;
   private AdminEmployeeService adminEmployeeService;
   private AdminFlightsService adminFlightsService;
+  private AdminSelectionService adminSelectionService;
   private ReservationPassengerRepository reservationPassengerRepository;
 
   public AdminController(AdminReportingService adminReportingService, AdminEmployeeService adminEmployeeService,
-      AdminFlightsService adminFlightsService, ReservationPassengerRepository reservationPassengerRepository) {
+      AdminFlightsService adminFlightsService, AdminSelectionService adminSelectionService,
+      ReservationPassengerRepository reservationPassengerRepository) {
     this.adminReportingService = adminReportingService;
     this.adminEmployeeService = adminEmployeeService;
     this.adminFlightsService = adminFlightsService;
+    this.adminSelectionService = adminSelectionService;
     this.reservationPassengerRepository = reservationPassengerRepository;
   }
 
@@ -81,19 +85,15 @@ public class AdminController {
     int selectedYear = year == null ? 2011 : year;
 
     List<FlightOptionView> flightOptions = adminReportingService.getFlightOptions();
-    String selectedFlightKey = selectFlightKey(flightKey, flightOptions);
-    FlightOptionView selectedFlight = parseFlightKey(selectedFlightKey);
+    String selectedFlightKey = adminSelectionService.selectFlightKey(flightKey, flightOptions);
+    FlightOptionView selectedFlight = adminSelectionService.parseFlightKey(selectedFlightKey);
 
     List<CustomerOptionView> customerOptions = adminReportingService.getCustomerOptions();
-    Long selectedCustomer = selectCustomerId(customerId, customerOptions);
-    String selectedCustomerName = customerOptions.stream()
-        .filter(option -> option.customerId().equals(selectedCustomer))
-        .map(option -> option.firstName() + " " + option.lastName())
-        .findFirst()
-        .orElse("");
+    Long selectedCustomer = adminSelectionService.selectCustomerId(customerId, customerOptions);
+    String selectedCustomerName = adminSelectionService.selectCustomerName(selectedCustomer, customerOptions);
 
     List<String> cityOptions = adminReportingService.getCityOptions();
-    String selectedCity = selectCity(city, cityOptions);
+    String selectedCity = adminSelectionService.selectCity(city, cityOptions);
 
     model.addAttribute("topCustomer", adminReportingService.getTopCustomer());
     model.addAttribute("topEmployee", adminReportingService.getTopEmployee());
@@ -137,16 +137,12 @@ public class AdminController {
       @RequestParam(name = "customer", required = false) Long customerId,
       Model model) {
     List<FlightOptionView> flightOptions = adminReportingService.getFlightOptions();
-    String selectedFlightKey = selectFlightKey(flightKey, flightOptions);
-    FlightOptionView selectedFlight = parseFlightKey(selectedFlightKey);
+    String selectedFlightKey = adminSelectionService.selectFlightKey(flightKey, flightOptions);
+    FlightOptionView selectedFlight = adminSelectionService.parseFlightKey(selectedFlightKey);
 
     List<CustomerOptionView> customerOptions = adminReportingService.getCustomerOptions();
-    Long selectedCustomer = selectCustomerId(customerId, customerOptions);
-    String selectedCustomerName = customerOptions.stream()
-        .filter(option -> option.customerId().equals(selectedCustomer))
-        .map(option -> option.firstName() + " " + option.lastName())
-        .findFirst()
-        .orElse("");
+    Long selectedCustomer = adminSelectionService.selectCustomerId(customerId, customerOptions);
+    String selectedCustomerName = adminSelectionService.selectCustomerName(selectedCustomer, customerOptions);
 
     List<SalesReservationView> flightReservations = adminReportingService.getSalesByFlight(
         selectedFlight.airlineId(), selectedFlight.flightNumber());
@@ -179,13 +175,13 @@ public class AdminController {
     model.addAttribute("flightStops", adminFlightsService.getAllFlightStops(allFlights));
 
     List<FlightOptionView> flightOptions = adminReportingService.getFlightOptions();
-    String selectedFlightKey = selectFlightKey(flightKey, flightOptions);
-    FlightOptionView selectedFlight = parseFlightKey(selectedFlightKey);
+    String selectedFlightKey = adminSelectionService.selectFlightKey(flightKey, flightOptions);
+    FlightOptionView selectedFlight = adminSelectionService.parseFlightKey(selectedFlightKey);
     List<CustomerOnFlightView> customersOnFlight = reservationPassengerRepository
         .findCustomersOnFlight(selectedFlight.airlineId(), selectedFlight.flightNumber());
 
     List<AirportOptionView> airportOptions = adminFlightsService.getAirportOptions();
-    String selectedAirport = selectAirportId(airportId, airportOptions);
+    String selectedAirport = adminSelectionService.selectAirportId(airportId, airportOptions);
     String selectedAirportName = airportOptions.stream()
         .filter(option -> option.id().equals(selectedAirport))
         .map(AirportOptionView::name)
@@ -205,53 +201,4 @@ public class AdminController {
     return "admin/flights";
   }
 
-  private String selectFlightKey(String flightKey, List<FlightOptionView> options) {
-    if (flightKey != null && flightKey.length() > 2) {
-      return flightKey;
-    }
-    if (options.isEmpty()) {
-      return "";
-    }
-    FlightOptionView first = options.get(0);
-    return first.airlineId() + first.flightNumber();
-  }
-
-  private FlightOptionView parseFlightKey(String flightKey) {
-    if (flightKey == null || flightKey.length() < 3) {
-      return new FlightOptionView("", 0);
-    }
-    String airlineId = flightKey.substring(0, 2);
-    Integer flightNumber = Integer.parseInt(flightKey.substring(2));
-    return new FlightOptionView(airlineId, flightNumber);
-  }
-
-  private Long selectCustomerId(Long customerId, List<CustomerOptionView> options) {
-    if (customerId != null) {
-      return customerId;
-    }
-    if (options.isEmpty()) {
-      return 0L;
-    }
-    return options.get(0).customerId();
-  }
-
-  private String selectCity(String city, List<String> options) {
-    if (city != null && !city.isBlank()) {
-      return city;
-    }
-    if (options.isEmpty()) {
-      return "";
-    }
-    return options.get(0);
-  }
-
-  private String selectAirportId(String airportId, List<AirportOptionView> options) {
-    if (airportId != null && !airportId.isBlank()) {
-      return airportId;
-    }
-    if (options.isEmpty()) {
-      return "";
-    }
-    return options.get(0).id();
-  }
 }

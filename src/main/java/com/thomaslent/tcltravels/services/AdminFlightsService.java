@@ -1,6 +1,5 @@
 package com.thomaslent.tcltravels.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,13 +26,15 @@ public class AdminFlightsService {
   private StopsAtRepository stopsAtRepository;
   private AirportRepository airportRepository;
   private LegRepository legRepository;
+  private FlightScheduleService flightScheduleService;
 
   public AdminFlightsService(FlightRepository flightRepository, StopsAtRepository stopsAtRepository,
-      AirportRepository airportRepository, LegRepository legRepository) {
+      AirportRepository airportRepository, LegRepository legRepository, FlightScheduleService flightScheduleService) {
     this.flightRepository = flightRepository;
     this.stopsAtRepository = stopsAtRepository;
     this.airportRepository = airportRepository;
     this.legRepository = legRepository;
+    this.flightScheduleService = flightScheduleService;
   }
 
   public List<FlightActivityView> getMostActiveFlights() {
@@ -93,7 +94,7 @@ public class AdminFlightsService {
         airlineName,
         flightNumber,
         flight.getNumberOfSeats(),
-        formatDaysOperating(flight.getDaysOperating()),
+        flightScheduleService.formatDaysOperating(flight.getDaysOperating()),
         originId,
         originCity,
         destinationId,
@@ -120,7 +121,7 @@ public class AdminFlightsService {
         airlineName,
         flightNumber,
         numberOfSeats,
-        formatDaysOperating(daysOperating),
+        flightScheduleService.formatDaysOperating(daysOperating),
         originId,
         originCity,
         destinationId,
@@ -145,27 +146,5 @@ public class AdminFlightsService {
 
   private AirportOptionView toAirportOption(Airport airport) {
     return new AirportOptionView(airport.getId(), airport.getName());
-  }
-
-  private static final String[] DAY_LABELS = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
-
-  private String formatDaysOperating(String daysOperating) {
-    if ("1111111".equals(daysOperating)) {
-      return "Every Day";
-    }
-    if ("0000000".equals(daysOperating)) {
-      return "Not Active";
-    }
-    if (daysOperating == null || daysOperating.length() != 7) {
-      return "";
-    }
-
-    List<String> days = new ArrayList<>();
-    for (int i = 0; i < 7; i++) {
-      if (daysOperating.charAt(i) == '1') {
-        days.add(DAY_LABELS[i]);
-      }
-    }
-    return String.join("-", days);
   }
 }

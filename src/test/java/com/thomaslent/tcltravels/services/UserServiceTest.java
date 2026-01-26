@@ -73,7 +73,7 @@ class UserServiceTest {
     Person savedPerson = personCaptor.getValue();
     assertThat(savedPerson.getFirstName()).isEqualTo("Jane");
     assertThat(savedPerson.getState()).isEqualTo("MA");
-    assertThat(savedPerson.getZipCode()).isEqualTo(2110);
+    assertThat(savedPerson.getZipCode()).isEqualTo("02110");
 
     User savedUser = userCaptor.getValue();
     assertThat(savedUser.getUsername()).isEqualTo("jane@example.com");
@@ -135,6 +135,6 @@ class UserServiceTest {
     Person savedPerson = personCaptor.getValue();
     assertThat(savedPerson.getFirstName()).isEqualTo("Jo");
     assertThat(savedPerson.getState()).isEqualTo("TX");
-    assertThat(savedPerson.getZipCode()).isEqualTo(73301);
+    assertThat(savedPerson.getZipCode()).isEqualTo("73301");
   }
 }

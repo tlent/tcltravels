@@ -1,9 +1,0 @@
-<div
-  th:replace="~{layouts/layout :: layout(~{::main}, 'TCL Travels - Flights', ~{fragments/scripts :: none})}"
->
-  <main>
-    <div th:replace="~{flights/modules/filter :: filter_box}"></div>
-    <div th:replace="~{flights/modules/recommended :: rec_list}"></div>
-    <div th:replace="~{flights/modules/best-selling :: best_selling_list}"></div>
-  </main>
-</div>

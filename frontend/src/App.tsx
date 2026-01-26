@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -16,34 +17,50 @@ import { AdminReservations } from './pages/admin/AdminReservations';
 import { Layout } from './components/layout/Layout';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 
+// Configure React Query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
+
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/flights" element={<Flights />} />
-              <Route path="/reservations" element={<Reservations />} />
-              <Route path="/reservations/new" element={<NewReservation />} />
-              <Route path="/reservations/bid" element={<PlaceBid />} />
-              <Route path="/admin" element={<Dashboard />} />
-              <Route path="/admin/sales" element={<Sales />} />
-              <Route path="/admin/flights" element={<AdminFlights />} />
-              <Route path="/admin/reservations" element={<AdminReservations />} />
-              <Route path="/admin/employees" element={<Employees />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/flights" element={<Flights />} />
+                <Route path="/reservations" element={<Reservations />} />
+                <Route path="/reservations/new" element={<NewReservation />} />
+                <Route path="/reservations/bid" element={<PlaceBid />} />
+                <Route path="/admin" element={<Dashboard />} />
+                <Route path="/admin/sales" element={<Sales />} />
+                <Route path="/admin/flights" element={<AdminFlights />} />
+                <Route path="/admin/reservations" element={<AdminReservations />} />
+                <Route path="/admin/employees" element={<Employees />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,33 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { reservationsApi } from '../api/reservations';
-import type { ReservationsResponse } from '../api/reservations';
 import { ReservationCard } from '../components/reservations/ReservationCard';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 
 export const Reservations: React.FC = () => {
-  const [data, setData] = useState<ReservationsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'current' | 'past'>('current');
 
-  useEffect(() => {
-    loadReservations();
-  }, []);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['reservations'],
+    queryFn: () => reservationsApi.getAll(),
+  });
 
-  const loadReservations = async () => {
-    try {
-      setLoading(true);
-      const result = await reservationsApi.getAll();
-      setData(result);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load reservations');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
@@ -35,7 +21,7 @@ export const Reservations: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">My Reservations</h1>
 
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={String(error)} />}
 
       {data && (
         <>
@@ -50,7 +36,7 @@ export const Reservations: React.FC = () => {
                     : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Current ({data.current.length})
+                Current ({data?.current.length || 0})
               </button>
               <button
                 onClick={() => setActiveTab('past')}
@@ -60,7 +46,7 @@ export const Reservations: React.FC = () => {
                     : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Past ({data.past.length})
+                Past ({data?.past.length || 0})
               </button>
             </div>
           </div>
@@ -68,20 +54,20 @@ export const Reservations: React.FC = () => {
           {/* Reservations */}
           <div className="mb-8">
             {activeTab === 'current' ? (
-              data.current.length > 0 ? (
-                data.current.map((res) => <ReservationCard key={res.id} reservation={res} />)
+              data?.current && data.current.length > 0 ? (
+                data.current.map((res: any) => <ReservationCard key={res.id} reservation={res} />)
               ) : (
                 <p className="text-gray-600">No current reservations</p>
               )
-            ) : data.past.length > 0 ? (
-              data.past.map((res) => <ReservationCard key={res.id} reservation={res} />)
+            ) : data?.past && data.past.length > 0 ? (
+              data.past.map((res: any) => <ReservationCard key={res.id} reservation={res} />)
             ) : (
               <p className="text-gray-600">No past reservations</p>
             )}
           </div>
 
           {/* Auction History */}
-          {data.auctions.length > 0 && (
+          {data?.auctions && data.auctions.length > 0 && (
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Auction History</h2>
               <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -106,7 +92,7 @@ export const Reservations: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.auctions.map((auction, idx) => (
+                    {data.auctions.map((auction: any, idx: number) => (
                       <tr key={idx}>
                         <td className="px-4 py-3">
                           {auction.airlineId} {auction.flightNumber}

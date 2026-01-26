@@ -1,34 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { flightsApi } from '../api/flights';
-import type { FlightsResponse, FlightSearchParams } from '../api/flights';
+import type { FlightSearchParams } from '../api/flights';
 import { FlightFilter } from '../components/flights/FlightFilter';
 import { FlightCard } from '../components/flights/FlightCard';
+import { StopCard } from '../components/flights/StopCard';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 
 export const Flights: React.FC = () => {
-  const [data, setData] = useState<FlightsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [searchParams, setSearchParams] = useState<FlightSearchParams>({});
 
-  useEffect(() => {
-    loadFlights({});
-  }, []);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['flights', searchParams],
+    queryFn: () => flightsApi.search(searchParams),
+  });
 
-  const loadFlights = async (params: FlightSearchParams) => {
-    try {
-      setLoading(true);
-      setError('');
-      const result = await flightsApi.search(params);
-      setData(result);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load flights');
-    } finally {
-      setLoading(false);
-    }
+  const handleSearch = (params: FlightSearchParams) => {
+    setSearchParams(params);
   };
 
-  if (loading && !data) {
+  if (isLoading && !data) {
     return <LoadingSpinner />;
   }
 
@@ -40,7 +32,7 @@ export const Flights: React.FC = () => {
         <FlightFilter
           airlines={data.filter.airlines}
           airports={data.filter.airports}
-          onSearch={loadFlights}
+          onSearch={handleSearch}
           initialValues={{
             airline: data.filter.airlineFilter,
             airport: data.filter.airportFilter,
@@ -50,67 +42,28 @@ export const Flights: React.FC = () => {
         />
       )}
 
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={String(error)} />}
 
-      {loading && <LoadingSpinner />}
+      {isLoading && <LoadingSpinner />}
 
-      {data && data.filter && !loading && (
+      {data && data.filter && !isLoading && (
         <>
           {/* Matching Flights */}
           {data.filter.stops && data.filter.stops.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Matching Flights ({data.filter.stops.length})
-              </h2>
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                          Flight
-                        </th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                          Airport
-                        </th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                          Departure
-                        </th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                          Arrival
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {data.filter.stops.map((stop, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50">
-                          <td className="px-4 py-3">
-                            {stop.airlineId} {stop.flightNumber}
-                          </td>
-                          <td className="px-4 py-3">{stop.airportId}</td>
-                          <td className="px-4 py-3">
-                            {new Date(stop.departureTime).toLocaleString()}
-                          </td>
-                          <td className="px-4 py-3">
-                            {stop.arrivalTime
-                              ? new Date(stop.arrivalTime).toLocaleString()
-                              : 'N/A'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Matching Flights</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {data.filter.stops.map((stop, idx) => (
+                  <StopCard key={idx} stop={stop} />
+                ))}
               </div>
             </div>
           )}
 
           {/* Recommended Flights */}
           {data.recommended && data.recommended.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Recommended for You
-              </h2>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Recommended Flights</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.recommended.map((flight, idx) => (
                   <FlightCard key={idx} flight={flight} />
@@ -121,10 +74,8 @@ export const Flights: React.FC = () => {
 
           {/* Best-Selling Flights */}
           {data.bestSelling && data.bestSelling.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Best-Selling Flights
-              </h2>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Best-Selling Flights</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.bestSelling.map((flight, idx) => (
                   <FlightCard key={idx} flight={flight} />
@@ -132,6 +83,15 @@ export const Flights: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* No Results */}
+          {(!data.filter.stops || data.filter.stops.length === 0) &&
+            (!data.recommended || data.recommended.length === 0) &&
+            (!data.bestSelling || data.bestSelling.length === 0) && (
+              <div className="mt-8 text-center text-gray-600">
+                <p>No flights found matching your criteria.</p>
+              </div>
+            )}
         </>
       )}
     </div>

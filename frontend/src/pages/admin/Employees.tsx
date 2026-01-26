@@ -1,44 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { employeesApi } from '../../api/employees';
-import type { AdminEmployeeView } from '../../api/employees';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
 
 export const Employees: React.FC = () => {
-  const [employees, setEmployees] = useState<AdminEmployeeView[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
+  const [mutationError, setMutationError] = useState('');
 
-  useEffect(() => {
-    loadEmployees();
-  }, []);
+  const { data: employees, isLoading, error } = useQuery({
+    queryKey: ['employees'],
+    queryFn: () => employeesApi.getAll(),
+  });
 
-  const loadEmployees = async () => {
-    try {
-      setLoading(true);
-      const data = await employeesApi.getAll();
-      setEmployees(data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load employees');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (personId: number) => employeesApi.delete(personId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+      setMutationError('');
+    },
+    onError: (err: any) => {
+      setMutationError(err.response?.data?.error || 'Failed to delete employee');
+    },
+  });
 
-  const handleDelete = async (personId: number, name: string) => {
+  const handleDelete = (personId: number, name: string) => {
     if (!confirm(`Are you sure you want to delete ${name}?`)) {
       return;
     }
-
-    try {
-      await employeesApi.delete(personId);
-      loadEmployees();
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to delete employee');
-    }
+    deleteMutation.mutate(personId);
   };
 
-  if (loading) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
@@ -46,7 +39,8 @@ export const Employees: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Employee Management</h1>
 
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={String(error)} />}
+      {mutationError && <ErrorMessage message={mutationError} />}
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
@@ -60,7 +54,7 @@ export const Employees: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {employees.map((emp) => (
+            {employees?.map((emp) => (
               <tr key={emp.personId}>
                 <td className="px-4 py-3">
                   {emp.firstName} {emp.lastName}

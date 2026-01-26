@@ -1,35 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { adminApi } from '../../api/admin';
-import type { DashboardResponse } from '../../api/admin';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const [data, setData] = useState<DashboardResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
-  useEffect(() => {
-    loadDashboard();
-  }, [selectedMonth, selectedYear]);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['dashboard', selectedMonth, selectedYear],
+    queryFn: () => adminApi.getDashboard(selectedMonth, selectedYear),
+  });
 
-  const loadDashboard = async () => {
-    try {
-      setLoading(true);
-      const result = await adminApi.getDashboard(selectedMonth, selectedYear);
-      setData(result);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load dashboard');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading && !data) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
@@ -37,7 +23,7 @@ export const Dashboard: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
 
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={String(error)} />}
 
       {data && (
         <>

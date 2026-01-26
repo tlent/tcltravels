@@ -1,30 +1,35 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
+import { loginSchema, type LoginFormData } from '../lib/validations';
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
   const { login, user } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-    try {
-      await login({ email, password });
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginFormData) => login(data),
+    onError: (err: any) => {
+      setError('root', {
+        message: err.response?.data?.error || 'Login failed. Please try again.',
+      });
+    },
+  });
 
-      // Redirect based on role (will be handled in useEffect below)
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate(data);
   };
 
   // Redirect after successful login
@@ -47,10 +52,10 @@ export const Login: React.FC = () => {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {errors.root && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
+              {errors.root.message}
             </div>
           )}
 
@@ -60,15 +65,15 @@ export const Login: React.FC = () => {
                 Email address
               </label>
               <input
+                {...register('email')}
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -76,25 +81,25 @@ export const Login: React.FC = () => {
                 Password
               </label>
               <input
+                {...register('password')}
                 id="password"
-                name="password"
                 type="password"
                 autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
           </div>
 
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loginMutation.isPending}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
 

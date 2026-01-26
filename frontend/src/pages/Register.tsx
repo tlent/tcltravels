@@ -1,70 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
+import { registerSchema, type RegisterFormData } from '../lib/validations';
 
 export const Register: React.FC = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    address: '',
-    city: '',
-    state: '',
-    zipcode: '',
-    telephone: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const { register } = useAuth();
+  const { register: registerUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    if (!/^\d{5}$/.test(formData.zipcode)) {
-      setError('ZIP code must be exactly 5 digits');
-      return;
-    }
-
-    if (formData.state.length !== 2) {
-      setError('State must be exactly 2 characters (e.g., NY)');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { confirmPassword, ...registerData } = formData;
-      await register(registerData);
+  const registerMutation = useMutation({
+    mutationFn: (data: Omit<RegisterFormData, 'confirmPassword'>) => registerUser(data),
+    onSuccess: () => {
       navigate('/');
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.error || err.response?.data?.fields?.email || 'Registration failed';
-      setError(errorMsg);
-    } finally {
-      setLoading(false);
-    }
+    },
+    onError: (err: any) => {
+      const errorMsg =
+        err.response?.data?.error ||
+        err.response?.data?.fields?.email ||
+        'Registration failed';
+      setError('root', { message: errorMsg });
+    },
+  });
+
+  const onSubmit = (data: RegisterFormData) => {
+    const { confirmPassword, ...registerData } = data;
+    // Convert state to uppercase
+    registerData.state = registerData.state.toUpperCase();
+    registerMutation.mutate(registerData);
   };
 
   return (
@@ -74,15 +47,13 @@ export const Register: React.FC = () => {
           <h2 className="text-3xl font-bold text-center text-gray-900">
             Create Account
           </h2>
-          <p className="mt-2 text-center text-gray-600">
-            Sign up for TCL Travels
-          </p>
+          <p className="mt-2 text-center text-gray-600">Sign up for TCL Travels</p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {errors.root && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
+              {errors.root.message}
             </div>
           )}
 
@@ -92,14 +63,14 @@ export const Register: React.FC = () => {
                 First Name *
               </label>
               <input
+                {...register('firstName')}
                 id="firstName"
-                name="firstName"
                 type="text"
-                required
-                value={formData.firstName}
-                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.firstName && (
+                <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
+              )}
             </div>
 
             <div>
@@ -107,14 +78,14 @@ export const Register: React.FC = () => {
                 Last Name *
               </label>
               <input
+                {...register('lastName')}
                 id="lastName"
-                name="lastName"
                 type="text"
-                required
-                value={formData.lastName}
-                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.lastName && (
+                <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
+              )}
             </div>
           </div>
 
@@ -123,14 +94,14 @@ export const Register: React.FC = () => {
               Address *
             </label>
             <input
+              {...register('address')}
               id="address"
-              name="address"
               type="text"
-              required
-              value={formData.address}
-              onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
+            {errors.address && (
+              <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-4">
@@ -139,14 +110,14 @@ export const Register: React.FC = () => {
                 City *
               </label>
               <input
+                {...register('city')}
                 id="city"
-                name="city"
                 type="text"
-                required
-                value={formData.city}
-                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
+              )}
             </div>
 
             <div>
@@ -154,16 +125,16 @@ export const Register: React.FC = () => {
                 State *
               </label>
               <input
+                {...register('state')}
                 id="state"
-                name="state"
                 type="text"
-                required
                 maxLength={2}
-                value={formData.state}
-                onChange={handleChange}
                 placeholder="NY"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.state && (
+                <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
+              )}
             </div>
 
             <div>
@@ -171,16 +142,16 @@ export const Register: React.FC = () => {
                 ZIP Code *
               </label>
               <input
+                {...register('zipcode')}
                 id="zipcode"
-                name="zipcode"
                 type="text"
-                required
                 maxLength={5}
-                value={formData.zipcode}
-                onChange={handleChange}
                 placeholder="12345"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.zipcode && (
+                <p className="mt-1 text-sm text-red-600">{errors.zipcode.message}</p>
+              )}
             </div>
           </div>
 
@@ -189,15 +160,15 @@ export const Register: React.FC = () => {
               Telephone *
             </label>
             <input
+              {...register('telephone')}
               id="telephone"
-              name="telephone"
               type="tel"
-              required
-              value={formData.telephone}
-              onChange={handleChange}
               placeholder="10 or 11 digits"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
+            {errors.telephone && (
+              <p className="mt-1 text-sm text-red-600">{errors.telephone.message}</p>
+            )}
           </div>
 
           <div>
@@ -205,14 +176,14 @@ export const Register: React.FC = () => {
               Email *
             </label>
             <input
+              {...register('email')}
               id="email"
-              name="email"
               type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -221,14 +192,14 @@ export const Register: React.FC = () => {
                 Password *
               </label>
               <input
+                {...register('password')}
                 id="password"
-                name="password"
                 type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
 
             <div>
@@ -236,24 +207,24 @@ export const Register: React.FC = () => {
                 Confirm Password *
               </label>
               <input
+                {...register('confirmPassword')}
                 id="confirmPassword"
-                name="confirmPassword"
                 type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+              )}
             </div>
           </div>
 
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={registerMutation.isPending}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating account...' : 'Sign up'}
+              {registerMutation.isPending ? 'Creating account...' : 'Sign up'}
             </button>
           </div>
 

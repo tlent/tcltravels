@@ -1,106 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { flightsApi } from '../api/flights';
 import { reservationsApi } from '../api/reservations';
 import type { CreateReservationRequest } from '../api/reservations';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ErrorMessage } from '../components/common/ErrorMessage';
+import { newReservationSchema, type NewReservationFormData } from '../lib/validations';
 
 export const NewReservation: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const airlineId = searchParams.get('airlineId') || '';
   const flightNumber = parseInt(searchParams.get('flightNumber') || '0');
 
-  const [stops, setStops] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [passengerCount, setPassengerCount] = useState(1);
-  const [formData, setFormData] = useState({
-    origin: 0,
-    destination: 0,
-    departureDate: '',
-    other: '',
-    passengers: [{ firstName: '', lastName: '', seatClass: 'Economy', meal: '' }],
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setError: setFormError,
+  } = useForm<NewReservationFormData>({
+    resolver: zodResolver(newReservationSchema),
+    defaultValues: {
+      origin: 1,
+      destination: 2,
+      departureDate: '',
+      other: '',
+      passengers: [{ firstName: '', lastName: '', seatClass: 'Economy', meal: '' }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'passengers',
+  });
+
+  const { data: stops, isLoading, error } = useQuery({
+    queryKey: ['flightStops', airlineId, flightNumber],
+    queryFn: () => flightsApi.getStops(airlineId, flightNumber),
   });
 
   useEffect(() => {
-    loadStops();
-  }, []);
-
-  const loadStops = async () => {
-    try {
-      const data = await flightsApi.getStops(airlineId, flightNumber);
-      setStops(data);
-      if (data.length > 0) {
-        setFormData((prev) => ({
-          ...prev,
-          origin: 1,
-          destination: data.length,
-          departureDate: data[0].departureDate,
-        }));
-      }
-    } catch (err: any) {
-      setError('Failed to load flight information');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePassengerCountChange = (count: number) => {
-    setPassengerCount(count);
-    const passengers = Array.from({ length: count }, (_, i) => formData.passengers[i] || {
-      firstName: '',
-      lastName: '',
-      seatClass: 'Economy',
-      meal: '',
-    });
-    setFormData((prev) => ({ ...prev, passengers }));
-  };
-
-  const handlePassengerChange = (index: number, field: string, value: string) => {
-    const updatedPassengers = [...formData.passengers];
-    updatedPassengers[index] = { ...updatedPassengers[index], [field]: value };
-    setFormData((prev) => ({ ...prev, passengers: updatedPassengers }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSubmitting(true);
-
-    try {
-      const request: CreateReservationRequest = {
-        airlineId,
-        flightNumber,
-        origin: formData.origin,
-        destination: formData.destination,
-        passengerCount,
-        departureDate: formData.departureDate,
-        other: formData.other,
-      };
-
-      // Map passengers to the backend format (first1, last1, class1, food1, etc.)
-      formData.passengers.forEach((p, i) => {
-        const idx = i + 1;
-        (request as any)[`first${idx}`] = p.firstName;
-        (request as any)[`last${idx}`] = p.lastName;
-        (request as any)[`class${idx}`] = p.seatClass;
-        (request as any)[`food${idx}`] = p.meal;
+    if (stops && stops.length > 0) {
+      reset({
+        origin: 1,
+        destination: stops.length,
+        departureDate: stops[0].departureDate,
+        other: '',
+        passengers: [{ firstName: '', lastName: '', seatClass: 'Economy', meal: '' }],
       });
+    }
+  }, [stops, reset]);
 
-      await reservationsApi.create(request);
+  const createReservationMutation = useMutation({
+    mutationFn: (request: CreateReservationRequest) => reservationsApi.create(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reservations'] });
       navigate('/reservations');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to create reservation');
-    } finally {
-      setSubmitting(false);
+    },
+    onError: (err: any) => {
+      setFormError('root', {
+        message: err.response?.data?.error || 'Failed to create reservation',
+      });
+    },
+  });
+
+  const onSubmit = (data: NewReservationFormData) => {
+    const request: CreateReservationRequest = {
+      airlineId,
+      flightNumber,
+      origin: data.origin,
+      destination: data.destination,
+      passengerCount: data.passengers.length,
+      departureDate: data.departureDate,
+      other: data.other || '',
+    };
+
+    // Map passengers to the backend format (first1, last1, class1, food1, etc.)
+    data.passengers.forEach((p, i) => {
+      const idx = i + 1;
+      (request as any)[`first${idx}`] = p.firstName;
+      (request as any)[`last${idx}`] = p.lastName;
+      (request as any)[`class${idx}`] = p.seatClass;
+      (request as any)[`food${idx}`] = p.meal || '';
+    });
+
+    createReservationMutation.mutate(request);
+  };
+
+  const addPassenger = () => {
+    if (fields.length < 5) {
+      append({ firstName: '', lastName: '', seatClass: 'Economy', meal: '' });
     }
   };
 
-  if (loading) {
+  const removePassenger = (index: number) => {
+    if (fields.length > 1) {
+      remove(index);
+    }
+  };
+
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
@@ -115,123 +121,164 @@ export const NewReservation: React.FC = () => {
           </h2>
         </div>
 
-        {error && <ErrorMessage message={error} />}
+        {error && <ErrorMessage message={String(error)} />}
+        {errors.root && <ErrorMessage message={errors.root.message || ''} />}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {/* Origin/Destination */}
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Origin Stop
+                Origin Stop *
               </label>
               <select
-                value={formData.origin}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, origin: parseInt(e.target.value) }))
-                }
+                {...register('origin', { valueAsNumber: true })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
               >
-                {stops.map((stop) => (
+                {stops?.map((stop) => (
                   <option key={stop.stopNumber} value={stop.stopNumber}>
                     Stop {stop.stopNumber}: {stop.airportId}
                   </option>
                 ))}
               </select>
+              {errors.origin && (
+                <p className="mt-1 text-sm text-red-600">{errors.origin.message}</p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Destination Stop
+                Destination Stop *
               </label>
               <select
-                value={formData.destination}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, destination: parseInt(e.target.value) }))
-                }
+                {...register('destination', { valueAsNumber: true })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
               >
-                {stops.map((stop) => (
+                {stops?.map((stop) => (
                   <option key={stop.stopNumber} value={stop.stopNumber}>
                     Stop {stop.stopNumber}: {stop.airportId}
                   </option>
                 ))}
               </select>
+              {errors.destination && (
+                <p className="mt-1 text-sm text-red-600">{errors.destination.message}</p>
+              )}
             </div>
           </div>
 
           {/* Departure Date */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Departure Date
+              Departure Date *
             </label>
             <input
+              {...register('departureDate')}
               type="date"
-              value={formData.departureDate}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, departureDate: e.target.value }))
-              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
+            {errors.departureDate && (
+              <p className="mt-1 text-sm text-red-600">{errors.departureDate.message}</p>
+            )}
           </div>
 
-          {/* Passenger Count */}
+          {/* Other/Special Requests */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Number of Passengers (1-5)
+              Special Requests (Optional)
             </label>
             <input
-              type="number"
-              min="1"
-              max="5"
-              value={passengerCount}
-              onChange={(e) => handlePassengerCountChange(parseInt(e.target.value))}
+              {...register('other')}
+              type="text"
+              placeholder="Any special requests or notes"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
 
           {/* Passenger Details */}
           <div className="space-y-4 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Passenger Details</h3>
-            {formData.passengers.map((passenger, idx) => (
-              <div key={idx} className="p-4 border border-gray-200 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-3">Passenger {idx + 1}</h4>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Passengers ({fields.length}/5)
+              </h3>
+              {fields.length < 5 && (
+                <button
+                  type="button"
+                  onClick={addPassenger}
+                  className="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                >
+                  + Add Passenger
+                </button>
+              )}
+            </div>
+
+            {errors.passengers && typeof errors.passengers === 'object' && !Array.isArray(errors.passengers) && (
+              <p className="text-sm text-red-600">{errors.passengers.message}</p>
+            )}
+
+            {fields.map((field, idx) => (
+              <div key={field.id} className="p-4 border border-gray-200 rounded-lg">
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-medium text-gray-900">Passenger {idx + 1}</h4>
+                  {fields.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removePassenger(idx)}
+                      className="text-red-600 hover:text-red-700 text-sm"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    value={passenger.firstName}
-                    onChange={(e) => handlePassengerChange(idx, 'firstName', e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                    required
-                  />
-                  <input
-                    type="text"
-                    placeholder="Last Name"
-                    value={passenger.lastName}
-                    onChange={(e) => handlePassengerChange(idx, 'lastName', e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                    required
-                  />
-                  <select
-                    value={passenger.seatClass}
-                    onChange={(e) => handlePassengerChange(idx, 'seatClass', e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="Economy">Economy</option>
-                    <option value="Business">Business</option>
-                    <option value="First">First Class</option>
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="Meal Preference"
-                    value={passenger.meal}
-                    onChange={(e) => handlePassengerChange(idx, 'meal', e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                  />
+                  <div>
+                    <input
+                      {...register(`passengers.${idx}.firstName`)}
+                      type="text"
+                      placeholder="First Name *"
+                      className="px-3 py-2 border border-gray-300 rounded-md w-full"
+                    />
+                    {errors.passengers?.[idx]?.firstName && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.passengers[idx]?.firstName?.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      {...register(`passengers.${idx}.lastName`)}
+                      type="text"
+                      placeholder="Last Name *"
+                      className="px-3 py-2 border border-gray-300 rounded-md w-full"
+                    />
+                    {errors.passengers?.[idx]?.lastName && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.passengers[idx]?.lastName?.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <select
+                      {...register(`passengers.${idx}.seatClass`)}
+                      className="px-3 py-2 border border-gray-300 rounded-md w-full"
+                    >
+                      <option value="Economy">Economy</option>
+                      <option value="Business">Business</option>
+                      <option value="First">First Class</option>
+                    </select>
+                    {errors.passengers?.[idx]?.seatClass && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.passengers[idx]?.seatClass?.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      {...register(`passengers.${idx}.meal`)}
+                      type="text"
+                      placeholder="Meal Preference (Optional)"
+                      className="px-3 py-2 border border-gray-300 rounded-md w-full"
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -241,10 +288,10 @@ export const NewReservation: React.FC = () => {
           <div className="flex gap-4">
             <button
               type="submit"
-              disabled={submitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
+              disabled={createReservationMutation.isPending}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {submitting ? 'Creating...' : 'Create Reservation'}
+              {createReservationMutation.isPending ? 'Creating...' : 'Create Reservation'}
             </button>
             <button
               type="button"

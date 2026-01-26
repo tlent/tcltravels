@@ -1,37 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '../../api/admin';
-import type { FlightsResponse } from '../../api/admin';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
 
 export const AdminFlights: React.FC = () => {
-  const [data, setData] = useState<FlightsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
   const [selectedFlight, setSelectedFlight] = useState<string>('');
   const [selectedAirport, setSelectedAirport] = useState<string>('');
 
-  useEffect(() => {
-    loadFlights();
-  }, [selectedFlight, selectedAirport]);
-
-  const loadFlights = async () => {
-    try {
-      setLoading(true);
-      const result = await adminApi.getFlights({
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['adminFlights', selectedFlight, selectedAirport],
+    queryFn: () =>
+      adminApi.getFlights({
         flight: selectedFlight || undefined,
         airport: selectedAirport || undefined,
-      });
-      setData(result);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load flights data');
-    } finally {
-      setLoading(false);
-    }
-  };
+      }),
+  });
 
-  if (loading && !data) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
@@ -39,7 +25,7 @@ export const AdminFlights: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Flight Management</h1>
 
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={String(error)} />}
 
       {data && (
         <>

@@ -1,36 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '../../api/admin';
-import type { ReservationsResponse } from '../../api/admin';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
 
 export const AdminReservations: React.FC = () => {
-  const [data, setData] = useState<ReservationsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
   const [selectedFlight, setSelectedFlight] = useState<string>('');
   const [selectedCustomer, setSelectedCustomer] = useState<number | undefined>();
   const [expandedReservations, setExpandedReservations] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    loadReservations();
-  }, [selectedFlight, selectedCustomer]);
-
-  const loadReservations = async () => {
-    try {
-      setLoading(true);
-      const result = await adminApi.getReservations({
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['adminReservations', selectedFlight, selectedCustomer],
+    queryFn: () =>
+      adminApi.getReservations({
         flight: selectedFlight || undefined,
         customer: selectedCustomer,
-      });
-      setData(result);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load reservations data');
-    } finally {
-      setLoading(false);
-    }
-  };
+      }),
+  });
 
   const toggleReservation = (id: number) => {
     setExpandedReservations((prev) => {
@@ -44,7 +30,7 @@ export const AdminReservations: React.FC = () => {
     });
   };
 
-  if (loading && !data) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
@@ -52,7 +38,7 @@ export const AdminReservations: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Reservation Management</h1>
 
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={String(error)} />}
 
       {data && (
         <>

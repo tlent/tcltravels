@@ -4,6 +4,7 @@ import { reservationsApi } from '../api/reservations';
 import { ReservationCard } from '../components/reservations/ReservationCard';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ErrorMessage } from '../components/common/ErrorMessage';
+import type { ReservationView, AuctionView } from '../types';
 
 export const Reservations: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'current' | 'past'>('current');
@@ -55,12 +56,12 @@ export const Reservations: React.FC = () => {
           <div className="mb-8">
             {activeTab === 'current' ? (
               data?.current && data.current.length > 0 ? (
-                data.current.map((res: any) => <ReservationCard key={res.id} reservation={res} />)
+                data.current.map((res: ReservationView) => <ReservationCard key={res.id} reservation={res} />)
               ) : (
                 <p className="text-gray-600">No current reservations</p>
               )
             ) : data?.past && data.past.length > 0 ? (
-              data.past.map((res: any) => <ReservationCard key={res.id} reservation={res} />)
+              data.past.map((res: ReservationView) => <ReservationCard key={res.id} reservation={res} />)
             ) : (
               <p className="text-gray-600">No past reservations</p>
             )}
@@ -92,7 +93,7 @@ export const Reservations: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.auctions.map((auction: any, idx: number) => (
+                    {data.auctions.map((auction: AuctionView, idx: number) => (
                       <tr key={idx}>
                         <td className="px-4 py-3">
                           {auction.airlineId} {auction.flightNumber}

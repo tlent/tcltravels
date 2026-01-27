@@ -1,14 +1,17 @@
 package com.thomaslent.tcltravels.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class ReservationForm {
   @NotBlank(message = "Airline is required.")
@@ -33,6 +36,11 @@ public class ReservationForm {
   @NotNull(message = "You must enter a departure date.")
   @DateTimeFormat(iso = ISO.DATE)
   private LocalDate departureDate;
+
+  // New structured passenger list (preferred)
+  @Valid
+  @Size(min = 1, max = 5, message = "Must have between 1 and 5 passengers.")
+  private List<PassengerInfo> passengers;
 
   private String first1;
   private String last1;
@@ -275,7 +283,26 @@ public class ReservationForm {
     this.food5 = food5;
   }
 
+  public List<PassengerInfo> getPassengers() {
+    return passengers;
+  }
+
+  public void setPassengers(List<PassengerInfo> passengers) {
+    this.passengers = passengers;
+    // Auto-sync passenger count when list is set
+    if (passengers != null) {
+      this.passengerCount = passengers.size();
+    }
+  }
+
+  /**
+   * Get first name by index (1-based).
+   * Prefers structured passengers list if available, falls back to numbered fields.
+   */
   public String getFirstName(int index) {
+    if (passengers != null && index >= 1 && index <= passengers.size()) {
+      return passengers.get(index - 1).getFirstName();
+    }
     switch (index) {
       case 1:
         return first1;
@@ -292,7 +319,14 @@ public class ReservationForm {
     }
   }
 
+  /**
+   * Get last name by index (1-based).
+   * Prefers structured passengers list if available, falls back to numbered fields.
+   */
   public String getLastName(int index) {
+    if (passengers != null && index >= 1 && index <= passengers.size()) {
+      return passengers.get(index - 1).getLastName();
+    }
     switch (index) {
       case 1:
         return last1;
@@ -309,7 +343,14 @@ public class ReservationForm {
     }
   }
 
+  /**
+   * Get flight class by index (1-based).
+   * Prefers structured passengers list if available, falls back to numbered fields.
+   */
   public String getFlightClass(int index) {
+    if (passengers != null && index >= 1 && index <= passengers.size()) {
+      return passengers.get(index - 1).getSeatClass();
+    }
     switch (index) {
       case 1:
         return class1;
@@ -326,7 +367,14 @@ public class ReservationForm {
     }
   }
 
+  /**
+   * Get food/meal preference by index (1-based).
+   * Prefers structured passengers list if available, falls back to numbered fields.
+   */
   public String getFood(int index) {
+    if (passengers != null && index >= 1 && index <= passengers.size()) {
+      return passengers.get(index - 1).getMeal();
+    }
     switch (index) {
       case 1:
         return food1;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '../../api/admin';
+import type { FlightOption, CustomerOption, SalesCustomerReservationView, SalesCityReservationView } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
 
@@ -78,7 +79,7 @@ export const Sales: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">All Flights</option>
-                    {data.flightOptions.map((flight: any) => (
+                    {data.flightOptions.map((flight: FlightOption) => (
                       <option key={`${flight.airlineId}-${flight.flightNumber}`} value={`${flight.airlineId}-${flight.flightNumber}`}>
                         {flight.airlineId}-{flight.flightNumber}
                       </option>
@@ -96,7 +97,7 @@ export const Sales: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">All Customers</option>
-                    {data.customerOptions.map((customer: any) => (
+                    {data.customerOptions.map((customer: CustomerOption) => (
                       <option key={customer.customerId} value={customer.customerId}>
                         {customer.firstName} {customer.lastName}
                       </option>
@@ -198,17 +199,21 @@ export const Sales: React.FC = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Customer</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reservations</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Spent</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reservation #</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Flight</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Booking Fee</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Fare</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.customerSales.map((customer: any) => (
-                      <tr key={customer.customerId}>
-                        <td className="px-4 py-2">{customer.firstName} {customer.lastName}</td>
-                        <td className="px-4 py-2">{customer.reservationCount}</td>
-                        <td className="px-4 py-2">${customer.totalSpent?.toFixed(2)}</td>
+                    {data.customerSales.map((sale: SalesCustomerReservationView) => (
+                      <tr key={sale.reservationNumber}>
+                        <td className="px-4 py-2">{sale.reservationNumber}</td>
+                        <td className="px-4 py-2">{sale.airlineId}-{sale.flightNumber}</td>
+                        <td className="px-4 py-2">{new Date(sale.reservationDate).toLocaleDateString()}</td>
+                        <td className="px-4 py-2">${sale.bookingFee.toFixed(2)}</td>
+                        <td className="px-4 py-2">${sale.totalFare.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -225,17 +230,21 @@ export const Sales: React.FC = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">City</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reservations</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Revenue</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reservation #</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Flight</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Booking Fee</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Fare</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.citySales.map((city: any) => (
-                      <tr key={city.city}>
-                        <td className="px-4 py-2">{city.city}</td>
-                        <td className="px-4 py-2">{city.reservationCount}</td>
-                        <td className="px-4 py-2">${city.totalRevenue?.toFixed(2)}</td>
+                    {data.citySales.map((sale: SalesCityReservationView) => (
+                      <tr key={sale.reservationNumber}>
+                        <td className="px-4 py-2">{sale.reservationNumber}</td>
+                        <td className="px-4 py-2">{sale.airlineId}-{sale.flightNumber}</td>
+                        <td className="px-4 py-2">{new Date(sale.reservationDate).toLocaleDateString()}</td>
+                        <td className="px-4 py-2">${sale.bookingFee.toFixed(2)}</td>
+                        <td className="px-4 py-2">${sale.totalFare.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>

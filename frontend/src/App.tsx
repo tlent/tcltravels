@@ -16,6 +16,7 @@ import { AdminFlights } from './pages/admin/AdminFlights';
 import { AdminReservations } from './pages/admin/AdminReservations';
 import { Layout } from './components/layout/Layout';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { RoleProtectedRoute } from './components/layout/RoleProtectedRoute';
 
 // Configure React Query client
 const queryClient = new QueryClient({
@@ -48,11 +49,15 @@ function App() {
                 <Route path="/reservations" element={<Reservations />} />
                 <Route path="/reservations/new" element={<NewReservation />} />
                 <Route path="/reservations/bid" element={<PlaceBid />} />
-                <Route path="/admin" element={<Dashboard />} />
-                <Route path="/admin/sales" element={<Sales />} />
-                <Route path="/admin/flights" element={<AdminFlights />} />
-                <Route path="/admin/reservations" element={<AdminReservations />} />
-                <Route path="/admin/employees" element={<Employees />} />
+
+                {/* Admin routes - requires EMPLOYEE or MANAGER role */}
+                <Route element={<RoleProtectedRoute allowedRoles={['EMPLOYEE', 'MANAGER']} />}>
+                  <Route path="/admin" element={<Dashboard />} />
+                  <Route path="/admin/sales" element={<Sales />} />
+                  <Route path="/admin/flights" element={<AdminFlights />} />
+                  <Route path="/admin/reservations" element={<AdminReservations />} />
+                  <Route path="/admin/employees" element={<Employees />} />
+                </Route>
               </Route>
             </Route>
 

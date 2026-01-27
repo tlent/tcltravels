@@ -165,16 +165,29 @@ public class ReservationsService {
       return Optional.of("Fare information is unavailable for this flight.");
     }
 
-    Optional<Reservation> reservationOpt = createReservationRecord(customerId, totalCost);
-    if (reservationOpt.isEmpty()) {
-      return Optional.of("Reservation could not be created.");
-    }
-    Reservation reservation = reservationOpt.get();
+    // Check seat capacity before creating reservation
     Optional<Flight> flightOpt = loadFlight(form.getAirlineId(), form.getFlightNumber());
     if (flightOpt.isEmpty()) {
       return Optional.of("Flight information is unavailable.");
     }
     Flight flight = flightOpt.get();
+
+    long currentSeats = reservationPassengerRepository.countSeatsForFlight(
+        form.getAirlineId(), form.getFlightNumber());
+    int requestedSeats = form.getPassengerCount();
+    int availableSeats = flight.getNumberOfSeats() - (int) currentSeats;
+
+    if (requestedSeats > availableSeats) {
+      return Optional.of(String.format(
+          "Not enough seats available. Requested: %d, Available: %d",
+          requestedSeats, availableSeats));
+    }
+
+    Optional<Reservation> reservationOpt = createReservationRecord(customerId, totalCost);
+    if (reservationOpt.isEmpty()) {
+      return Optional.of("Reservation could not be created.");
+    }
+    Reservation reservation = reservationOpt.get();
     insertLegs(reservation, flight, form.getOrigin(), form.getDestination());
 
     Customer customer = customerRepository.findById(customerId).orElse(null);
@@ -242,6 +255,21 @@ public class ReservationsService {
       return new BidResult(false, false, "Auction could not be saved.");
     }
 
+    // Check seat capacity before accepting bid
+    Optional<Flight> flightOpt = loadFlight(form.getAirlineId(), form.getFlightNumber());
+    if (flightOpt.isEmpty()) {
+      return new BidResult(false, false, "Flight information is unavailable.");
+    }
+    Flight flight = flightOpt.get();
+
+    long currentSeats = reservationPassengerRepository.countSeatsForFlight(
+        form.getAirlineId(), form.getFlightNumber());
+    int availableSeats = flight.getNumberOfSeats() - (int) currentSeats;
+
+    if (availableSeats < 1) {
+      return new BidResult(false, false, "No seats available on this flight.");
+    }
+
     StopsAt lastStop = stopsAtRepository
         .findTopByFlight_Airline_IdAndFlight_FlightNumberOrderByStopNumberDesc(
             form.getAirlineId(), form.getFlightNumber());
@@ -259,11 +287,6 @@ public class ReservationsService {
       return new BidResult(false, false, "Reservation could not be created.");
     }
     Reservation reservation = reservationOpt.get();
-    Optional<Flight> flightOpt = loadFlight(form.getAirlineId(), form.getFlightNumber());
-    if (flightOpt.isEmpty()) {
-      return new BidResult(false, false, "Flight information is unavailable.");
-    }
-    Flight flight = flightOpt.get();
     insertLegs(reservation, flight, 1, lastStop.getStopNumber());
 
     Customer customer = customerRepository.findById(customerId).orElse(null);

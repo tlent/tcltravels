@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '../../api/admin';
+import type { FlightOption, FlightActivityView, FlightSummaryView, FlightStopView, AirportOptionView } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
 
@@ -42,9 +43,9 @@ export const AdminFlights: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">All Flights</option>
-                    {data.flightOptions.map((flight: any) => (
+                    {data.flightOptions.map((flight: FlightOption) => (
                       <option key={`${flight.airlineId}-${flight.flightNumber}`} value={`${flight.airlineId}-${flight.flightNumber}`}>
-                        {flight.airlineId}-{flight.flightNumber}
+                        {flight.label}
                       </option>
                     ))}
                   </select>
@@ -60,9 +61,9 @@ export const AdminFlights: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">All Airports</option>
-                    {data.airportOptions.map((airport: any) => (
-                      <option key={airport.airportId} value={airport.airportId}>
-                        {airport.airportId} - {airport.name}
+                    {data.airportOptions.map((airport: AirportOptionView) => (
+                      <option key={airport.id} value={airport.id}>
+                        {airport.id} - {airport.name}
                       </option>
                     ))}
                   </select>
@@ -86,12 +87,12 @@ export const AdminFlights: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.mostActiveFlights.map((flight: any) => (
+                    {data.mostActiveFlights.map((flight: FlightActivityView) => (
                       <tr key={`${flight.airlineId}-${flight.flightNumber}`}>
                         <td className="px-4 py-2">{flight.airlineId}-{flight.flightNumber}</td>
                         <td className="px-4 py-2">{flight.airlineName}</td>
                         <td className="px-4 py-2">{flight.reservationCount}</td>
-                        <td className="px-4 py-2">${flight.totalRevenue?.toFixed(2)}</td>
+                        <td className="px-4 py-2">N/A</td>
                       </tr>
                     ))}
                   </tbody>
@@ -115,14 +116,14 @@ export const AdminFlights: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.allFlights.map((flight: any) => (
+                    {data.allFlights.map((flight: FlightSummaryView) => (
                       <tr key={`${flight.airlineId}-${flight.flightNumber}`}>
                         <td className="px-4 py-2">{flight.airlineId}-{flight.flightNumber}</td>
                         <td className="px-4 py-2">{flight.airlineName}</td>
-                        <td className="px-4 py-2">{flight.daysOfWeek}</td>
+                        <td className="px-4 py-2">{flight.daysOperating}</td>
                         <td className="px-4 py-2">
-                          <span className={`px-2 py-1 rounded text-sm ${flight.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {flight.active ? 'Active' : 'Inactive'}
+                          <span className="px-2 py-1 rounded text-sm bg-green-100 text-green-800">
+                            Active
                           </span>
                         </td>
                       </tr>
@@ -148,7 +149,7 @@ export const AdminFlights: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.flightStops.map((stop: any) => (
+                    {data.flightStops.map((stop: FlightStopView) => (
                       <tr key={stop.stopNumber}>
                         <td className="px-4 py-2">{stop.stopNumber}</td>
                         <td className="px-4 py-2">{stop.airportId} - {stop.airportName}</td>

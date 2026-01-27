@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '../../api/admin';
+import type { FlightOption, CustomerOption, SalesCustomerReservationView } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorMessage } from '../../components/common/ErrorMessage';
 
@@ -55,7 +56,7 @@ export const AdminReservations: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">All Flights</option>
-                    {data.flightOptions.map((flight: any) => (
+                    {data.flightOptions.map((flight: FlightOption) => (
                       <option key={`${flight.airlineId}-${flight.flightNumber}`} value={`${flight.airlineId}-${flight.flightNumber}`}>
                         {flight.airlineId}-{flight.flightNumber}
                       </option>
@@ -73,7 +74,7 @@ export const AdminReservations: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">All Customers</option>
-                    {data.customerOptions.map((customer: any) => (
+                    {data.customerOptions.map((customer: CustomerOption) => (
                       <option key={customer.customerId} value={customer.customerId}>
                         {customer.firstName} {customer.lastName}
                       </option>
@@ -145,17 +146,21 @@ export const AdminReservations: React.FC = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Customer</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reservation Count</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Spent</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reservation #</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Flight</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Booking Fee</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Fare</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {data.customerReservations.map((customer: any) => (
-                      <tr key={customer.customerId}>
-                        <td className="px-4 py-2">{customer.firstName} {customer.lastName}</td>
-                        <td className="px-4 py-2">{customer.reservationCount}</td>
-                        <td className="px-4 py-2">${customer.totalSpent?.toFixed(2)}</td>
+                    {data.customerReservations.map((reservation: SalesCustomerReservationView) => (
+                      <tr key={reservation.reservationNumber}>
+                        <td className="px-4 py-2">{reservation.reservationNumber}</td>
+                        <td className="px-4 py-2">{reservation.airlineId}-{reservation.flightNumber}</td>
+                        <td className="px-4 py-2">{new Date(reservation.reservationDate).toLocaleDateString()}</td>
+                        <td className="px-4 py-2">${reservation.bookingFee.toFixed(2)}</td>
+                        <td className="px-4 py-2">${reservation.totalFare.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>

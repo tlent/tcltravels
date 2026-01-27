@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ReservationView } from '../../api/reservations';
+import type { ReservationView, LegView } from '../../types';
 
 interface ReservationCardProps {
   reservation: ReservationView;
@@ -39,7 +39,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation })
       {expanded && (
         <div className="mt-4 border-t pt-4">
           <h4 className="font-semibold text-gray-900 mb-2">Flight Legs:</h4>
-          {reservation.legs.map((leg, idx) => (
+          {reservation.legs.map((leg: LegView, idx: number) => (
             <div key={idx} className="mb-3 p-3 bg-gray-50 rounded">
               <div className="flex justify-between items-center">
                 <div>

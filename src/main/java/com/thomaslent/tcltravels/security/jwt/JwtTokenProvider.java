@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -17,9 +19,13 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class JwtTokenProvider {
+
+  private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+  private static final int MINIMUM_SECRET_LENGTH = 32;
 
   @Value("${jwt.secret}")
   private String jwtSecret;
@@ -29,6 +35,25 @@ public class JwtTokenProvider {
 
   @Value("${jwt.refresh-token-expiration-ms}")
   private long refreshTokenExpirationMs;
+
+  @PostConstruct
+  public void validateConfiguration() {
+    if (jwtSecret == null || jwtSecret.trim().isEmpty()) {
+      throw new IllegalStateException(
+          "JWT_SECRET environment variable must be set. " +
+          "Please configure a secure random string of at least " + MINIMUM_SECRET_LENGTH + " characters."
+      );
+    }
+
+    if (jwtSecret.length() < MINIMUM_SECRET_LENGTH) {
+      throw new IllegalStateException(
+          "JWT_SECRET is too short (current: " + jwtSecret.length() + " characters). " +
+          "Minimum required: " + MINIMUM_SECRET_LENGTH + " characters for security."
+      );
+    }
+
+    logger.info("JWT configuration validated successfully (secret length: {} characters)", jwtSecret.length());
+  }
 
   private SecretKey getSigningKey() {
     return Keys.hmacShaKeyFor(jwtSecret.getBytes());
@@ -113,6 +138,68 @@ public class JwtTokenProvider {
         .getPayload();
 
     return claims.get("role", String.class);
+  }
+
+  public String getRoleLabelFromToken(String token) {
+    Claims claims = Jwts.parser()
+        .verifyWith(getSigningKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return claims.get("roleLabel", String.class);
+  }
+
+  public String getFirstNameFromToken(String token) {
+    Claims claims = Jwts.parser()
+        .verifyWith(getSigningKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return claims.get("firstName", String.class);
+  }
+
+  public String getLastNameFromToken(String token) {
+    Claims claims = Jwts.parser()
+        .verifyWith(getSigningKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return claims.get("lastName", String.class);
+  }
+
+  /**
+   * Reconstructs a UserPrincipal from a validated JWT token.
+   * This should only be called after validateToken() returns true.
+   *
+   * @param token the validated JWT token
+   * @return UserPrincipal containing user details from token claims
+   */
+  public UserPrincipal getUserPrincipalFromToken(String token) {
+    Long userId = getUserIdFromToken(token);
+    Long personId = getPersonIdFromToken(token);
+    Long customerId = getCustomerIdFromToken(token);
+    String firstName = getFirstNameFromToken(token);
+    String lastName = getLastNameFromToken(token);
+    String username = getUsernameFromToken(token);
+    String role = getRoleFromToken(token);
+    String roleLabel = getRoleLabelFromToken(token);
+
+    return new UserPrincipal(
+        userId,
+        personId,
+        customerId,
+        firstName,
+        lastName,
+        username,
+        null, // password not needed for token refresh
+        roleLabel,
+        java.util.Collections.singleton(
+            new org.springframework.security.core.authority.SimpleGrantedAuthority(role)
+        )
+    );
   }
 
   public boolean validateToken(String token) {

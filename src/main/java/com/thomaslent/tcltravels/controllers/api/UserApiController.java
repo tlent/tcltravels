@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thomaslent.tcltravels.dto.UserDto;
+import com.thomaslent.tcltravels.dto.responses.ErrorResponse;
 import com.thomaslent.tcltravels.security.UserPrincipal;
 import com.thomaslent.tcltravels.services.UserService;
 
@@ -50,21 +51,5 @@ public class UserApiController {
 
     UserDto updatedUser = userService.getUserDto(userPrincipal.getPersonId());
     return ResponseEntity.ok(updatedUser);
-  }
-
-  private static class ErrorResponse {
-    private String error;
-
-    public ErrorResponse(String error) {
-      this.error = error;
-    }
-
-    public String getError() {
-      return error;
-    }
-
-    public void setError(String error) {
-      this.error = error;
-    }
   }
 }

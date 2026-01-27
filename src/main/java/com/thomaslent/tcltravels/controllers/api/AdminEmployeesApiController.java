@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thomaslent.tcltravels.dto.AdminEmployeeView;
 import com.thomaslent.tcltravels.dto.EmployeeCreateForm;
 import com.thomaslent.tcltravels.dto.EmployeeEditForm;
+import com.thomaslent.tcltravels.dto.responses.ErrorResponse;
+import com.thomaslent.tcltravels.dto.responses.SuccessResponse;
 import com.thomaslent.tcltravels.services.AdminEmployeeService;
 
 import jakarta.validation.Valid;
@@ -91,37 +93,5 @@ public class AdminEmployeesApiController {
       return ResponseEntity.notFound().build();
     }
     return ResponseEntity.ok(new SuccessResponse("Employee deleted successfully"));
-  }
-
-  private static class ErrorResponse {
-    private String error;
-
-    public ErrorResponse(String error) {
-      this.error = error;
-    }
-
-    public String getError() {
-      return error;
-    }
-
-    public void setError(String error) {
-      this.error = error;
-    }
-  }
-
-  private static class SuccessResponse {
-    private String message;
-
-    public SuccessResponse(String message) {
-      this.message = message;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public void setMessage(String message) {
-      this.message = message;
-    }
   }
 }

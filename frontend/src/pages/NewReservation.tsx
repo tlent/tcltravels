@@ -80,16 +80,8 @@ export const NewReservation: React.FC = () => {
       passengerCount: data.passengers.length,
       departureDate: data.departureDate,
       other: data.other || '',
+      passengers: data.passengers,
     };
-
-    // Map passengers to the backend format (first1, last1, class1, food1, etc.)
-    data.passengers.forEach((p, i) => {
-      const idx = i + 1;
-      (request as any)[`first${idx}`] = p.firstName;
-      (request as any)[`last${idx}`] = p.lastName;
-      (request as any)[`class${idx}`] = p.seatClass;
-      (request as any)[`food${idx}`] = p.meal || '';
-    });
 
     createReservationMutation.mutate(request);
   };

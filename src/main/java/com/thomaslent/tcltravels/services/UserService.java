@@ -8,6 +8,7 @@ import com.thomaslent.tcltravels.dto.UserDto;
 import com.thomaslent.tcltravels.entities.Customer;
 import com.thomaslent.tcltravels.entities.Person;
 import com.thomaslent.tcltravels.entities.User;
+import com.thomaslent.tcltravels.exceptions.ResourceNotFoundException;
 import com.thomaslent.tcltravels.repositories.CustomerRepository;
 import com.thomaslent.tcltravels.repositories.PersonRepository;
 import com.thomaslent.tcltravels.repositories.UserRepository;
@@ -29,8 +30,10 @@ public class UserService {
   }
 
   public UserDto getUserDto(Long id) {
-    Person person = personRepository.findById(id).get();
-    User user = userRepository.findByPerson(person).get();
+    Person person = personRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Person", id));
+    User user = userRepository.findByPerson(person)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found for person id: " + id));
 
     UserDto userDto = new UserDto();
     userDto.setFirstName(person.getFirstName());
@@ -71,8 +74,10 @@ public class UserService {
 
   @Transactional
   public boolean editCustomer(Long id, UserDto dto) {
-    Person person = personRepository.findById(id).get();
-    User user = userRepository.findByPerson(person).get();
+    Person person = personRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Person", id));
+    User user = userRepository.findByPerson(person)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found for person id: " + id));
     String password = dto.getPassword();
     if (password == null || !passwordEncoder.matches(password, user.getPassword())) {
       return false;

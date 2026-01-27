@@ -16,6 +16,7 @@ import com.thomaslent.tcltravels.dto.AuthResponse;
 import com.thomaslent.tcltravels.dto.LoginRequest;
 import com.thomaslent.tcltravels.dto.RefreshTokenRequest;
 import com.thomaslent.tcltravels.dto.UserDto;
+import com.thomaslent.tcltravels.dto.responses.ErrorResponse;
 import com.thomaslent.tcltravels.security.UserPrincipal;
 import com.thomaslent.tcltravels.security.jwt.JwtTokenProvider;
 import com.thomaslent.tcltravels.services.UserService;
@@ -117,11 +118,14 @@ public class AuthController {
             .body(new ErrorResponse("Invalid or expired refresh token"));
       }
 
-      String username = tokenProvider.getUsernameFromToken(refreshToken);
+      // Reconstruct user principal from validated token claims
+      UserPrincipal userPrincipal = tokenProvider.getUserPrincipalFromToken(refreshToken);
 
-      // Re-authenticate to get fresh user details
-      Authentication authentication = authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(username, null));
+      // Create authentication object for new access token generation
+      Authentication authentication = new UsernamePasswordAuthenticationToken(
+          userPrincipal,
+          null,
+          userPrincipal.getAuthorities());
 
       String newAccessToken = tokenProvider.generateAccessToken(authentication);
 
@@ -129,22 +133,6 @@ public class AuthController {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .body(new ErrorResponse("Failed to refresh token"));
-    }
-  }
-
-  private static class ErrorResponse {
-    private String error;
-
-    public ErrorResponse(String error) {
-      this.error = error;
-    }
-
-    public String getError() {
-      return error;
-    }
-
-    public void setError(String error) {
-      this.error = error;
     }
   }
 

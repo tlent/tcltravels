@@ -21,6 +21,9 @@ import com.thomaslent.tcltravels.dto.AuctionView;
 import com.thomaslent.tcltravels.dto.BidForm;
 import com.thomaslent.tcltravels.dto.ReservationForm;
 import com.thomaslent.tcltravels.dto.ReservationView;
+import com.thomaslent.tcltravels.dto.responses.BidResponse;
+import com.thomaslent.tcltravels.dto.responses.ErrorResponse;
+import com.thomaslent.tcltravels.dto.responses.SuccessResponse;
 import com.thomaslent.tcltravels.security.UserPrincipal;
 import com.thomaslent.tcltravels.services.AuctionsService;
 import com.thomaslent.tcltravels.services.ReservationsService;
@@ -117,73 +120,5 @@ public class ReservationsApiController {
     }
 
     return ResponseEntity.ok(new BidResponse(false, false, "Bid submitted successfully"));
-  }
-
-  private static class ErrorResponse {
-    private String error;
-
-    public ErrorResponse(String error) {
-      this.error = error;
-    }
-
-    public String getError() {
-      return error;
-    }
-
-    public void setError(String error) {
-      this.error = error;
-    }
-  }
-
-  private static class SuccessResponse {
-    private String message;
-
-    public SuccessResponse(String message) {
-      this.message = message;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public void setMessage(String message) {
-      this.message = message;
-    }
-  }
-
-  private static class BidResponse {
-    private boolean accepted;
-    private boolean rejected;
-    private String message;
-
-    public BidResponse(boolean accepted, boolean rejected, String message) {
-      this.accepted = accepted;
-      this.rejected = rejected;
-      this.message = message;
-    }
-
-    public boolean isAccepted() {
-      return accepted;
-    }
-
-    public void setAccepted(boolean accepted) {
-      this.accepted = accepted;
-    }
-
-    public boolean isRejected() {
-      return rejected;
-    }
-
-    public void setRejected(boolean rejected) {
-      this.rejected = rejected;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public void setMessage(String message) {
-      this.message = message;
-    }
   }
 }

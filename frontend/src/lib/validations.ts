@@ -1,9 +1,12 @@
 import { z } from 'zod';
 
+// Password validation regex - requires uppercase, lowercase, and digit
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/;
+
 // Auth schemas
 export const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 export const registerSchema = z.object({
@@ -19,9 +22,18 @@ export const registerSchema = z.object({
     .string()
     .length(5, 'ZIP code must be 5 digits')
     .regex(/^\d{5}$/, 'ZIP code must contain only digits'),
-  telephone: z.string().min(1, 'Phone number is required'),
+  telephone: z
+    .string()
+    .regex(/^\d{10,11}$/, 'Phone must be 10-11 digits (numbers only)'),
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(100, 'Password must be at most 100 characters')
+    .regex(
+      passwordRegex,
+      'Password must contain at least one uppercase letter, one lowercase letter, and one digit'
+    ),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -42,7 +54,9 @@ export const updateProfileSchema = z.object({
     .string()
     .length(5, 'ZIP code must be 5 digits')
     .regex(/^\d{5}$/, 'ZIP code must contain only digits'),
-  telephone: z.string().min(1, 'Phone number is required'),
+  telephone: z
+    .string()
+    .regex(/^\d{10,11}$/, 'Phone must be 10-11 digits (numbers only)'),
   currentPassword: z.string().min(1, 'Current password is required to make changes'),
 });
 
@@ -99,7 +113,9 @@ export const employeeCreateSchema = z.object({
     .string()
     .length(5, 'ZIP code must be 5 digits')
     .regex(/^\d{5}$/, 'ZIP code must contain only digits'),
-  telephone: z.string().min(1, 'Phone number is required'),
+  telephone: z
+    .string()
+    .regex(/^\d{10,11}$/, 'Phone must be 10-11 digits (numbers only)'),
   ssn: z
     .string()
     .regex(/^\d{9}$/, 'SSN must be 9 digits (no dashes)'),
@@ -109,7 +125,14 @@ export const employeeCreateSchema = z.object({
     .regex(/^\d+(\.\d{1,2})?$/, 'Hourly rate must be a valid number'),
   isManager: z.boolean(),
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(100, 'Password must be at most 100 characters')
+    .regex(
+      passwordRegex,
+      'Password must contain at least one uppercase letter, one lowercase letter, and one digit'
+    ),
 });
 
 export const employeeEditSchema = z.object({
@@ -125,7 +148,9 @@ export const employeeEditSchema = z.object({
     .string()
     .length(5, 'ZIP code must be 5 digits')
     .regex(/^\d{5}$/, 'ZIP code must contain only digits'),
-  telephone: z.string().min(1, 'Phone number is required'),
+  telephone: z
+    .string()
+    .regex(/^\d{10,11}$/, 'Phone must be 10-11 digits (numbers only)'),
   ssn: z
     .string()
     .regex(/^\d{9}$/, 'SSN must be 9 digits (no dashes)'),

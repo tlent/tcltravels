@@ -20,6 +20,12 @@ public class UserDto {
   @NotBlank(message = "Email is required")
   private String email;
 
+  @NotBlank(message = "Password is required")
+  @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
+  @Pattern(
+      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
+      message = "Password must contain at least one uppercase letter, one lowercase letter, and one digit"
+  )
   private String password;
 
   @Pattern(regexp = "^\\d{5}$", message = "ZIP must be exactly 5 digits")

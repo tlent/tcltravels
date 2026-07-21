@@ -192,4 +192,4 @@ npm test
 
 ## License
 
-Copyright © 2024 Thomas Lent
+Copyright © 2026 Thomas Lent
